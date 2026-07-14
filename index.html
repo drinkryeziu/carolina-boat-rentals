@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Carolina Boat Rentals — Lake Norman Pontoon & Waverunner Rentals</title>
+<meta name="description" content="Book Lake Norman pontoon boats, waverunners & guided tours online. Live availability, instant confirmation, and dock delivery. Cornelius, NC." />
+<style>
+:root{
+  --navy:#0b2942;
+  --deep:#0f3a5f;
+  --blue:#1266b8;
+  --sky:#2e9fe0;
+  --aqua:#38c1c9;
+  --sun:#ffb020;
+  --sun-deep:#f59300;
+  --sand:#f6f1e7;
+  --ink:#0c1b28;
+  --muted:#5d7186;
+  --line:#e4e9ef;
+  --paper:#ffffff;
+  --bg:#f4f7fa;
+  --ok:#1f9d55;
+  --shadow:0 10px 30px rgba(11,41,66,.10);
+  --shadow-lg:0 24px 60px rgba(11,41,66,.20);
+  --radius:16px;
+  --maxw:1180px;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4{line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.section{padding:88px 0}
+.section h2{font-size:clamp(28px,4vw,44px)}
+.lede{color:var(--muted);font-size:18px;max-width:620px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:15.5px;padding:14px 24px;border-radius:999px;transition:.18s transform,.18s box-shadow,.18s background;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn-sun{background:linear-gradient(180deg,var(--sun),var(--sun-deep));color:#3a2500;box-shadow:0 8px 22px rgba(245,147,0,.35)}
+.btn-sun:hover{box-shadow:0 12px 28px rgba(245,147,0,.45)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:#123a5c}
+.btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.32)}
+.btn-ghost:hover{background:rgba(255,255,255,.24)}
+.btn-line{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+.btn-line:hover{border-color:var(--blue);color:var(--blue)}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;padding:7px 13px;border-radius:999px;background:#eaf3fb;color:var(--blue)}
+
+/* ---------- NAV ---------- */
+header.nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;color:var(--navy);letter-spacing:-.02em}
+.brand .mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(140deg,var(--sky),var(--deep));display:grid;place-items:center;box-shadow:var(--shadow)}
+.brand small{display:block;font-size:10.5px;font-weight:600;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-top:1px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:15px;font-weight:600;color:#20344a}
+.nav-links a:hover{color:var(--blue)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+.nav-phone{font-weight:800;color:var(--navy);font-size:15px;display:flex;align-items:center;gap:7px}
+.burger{display:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff}
+.burger span{display:block;width:20px;height:2px;background:var(--navy);margin:4px auto;border-radius:2px}
+.mobile-menu{display:none}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;background:linear-gradient(180deg,#0b2942 0%,#0f3a5f 55%,#155886 100%);color:#fff;overflow:hidden;padding:56px 0 130px}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(900px 420px at 82% -8%,rgba(56,193,201,.28),transparent 60%),
+  radial-gradient(700px 500px at 8% 110%,rgba(18,102,184,.42),transparent 60%);pointer-events:none}
+.waves{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:110px;pointer-events:none;opacity:.9}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(34px,5.4vw,58px);letter-spacing:-.03em}
+.hero h1 span{background:linear-gradient(90deg,var(--sun),#ffd27a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{font-size:19px;color:#cfe2f2;margin-top:18px;max-width:520px}
+.trust-row{display:flex;flex-wrap:wrap;gap:20px;margin-top:26px;align-items:center}
+.stars{color:var(--sun);letter-spacing:2px;font-size:16px}
+.trust-row .t{font-size:14px;color:#dce9f5}
+.trust-row .t b{color:#fff}
+.hero-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.hero-badges .pill{background:rgba(255,255,255,.12);color:#eaf4ff}
+
+/* booking widget */
+.booker{background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);padding:22px;color:var(--ink)}
+.booker h3{font-size:19px;color:var(--navy)}
+.booker .muted{color:var(--muted);font-size:13.5px;margin-top:3px}
+.booker-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1 / -1}
+.field label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.field select,.field input{appearance:none;-webkit-appearance:none;width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;font-family:inherit;color:var(--ink);background:#fbfcfe}
+.field select:focus,.field input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(18,102,184,.12)}
+.booker .btn{width:100%;margin-top:14px;padding:15px}
+.booker-foot{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--muted)}
+
+/* ---------- STAT STRIP ---------- */
+.strip{background:#fff;border-bottom:1px solid var(--line)}
+.strip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:26px 0}
+.strip .s{text-align:center}
+.strip .s b{display:block;font-size:26px;color:var(--navy);letter-spacing:-.02em}
+.strip .s span{font-size:13.5px;color:var(--muted)}
+
+/* ---------- FLEET ---------- */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:.2s transform,.2s box-shadow}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.card .media{aspect-ratio:16/10;position:relative;overflow:hidden}
+.card .media .price-tag{position:absolute;left:14px;bottom:14px;background:rgba(11,41,66,.92);color:#fff;font-weight:800;font-size:14px;padding:8px 13px;border-radius:999px;backdrop-filter:blur(4px)}
+.card .media .avail{position:absolute;right:14px;top:14px;background:#fff;color:var(--ok);font-weight:700;font-size:12px;padding:6px 11px;border-radius:999px;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(31,157,85,.18)}
+.card .body{padding:20px}
+.card .body h3{font-size:20px;color:var(--navy)}
+.card .cap{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 14px}
+.tag{font-size:12.5px;font-weight:600;color:#37506a;background:#eef3f8;padding:5px 10px;border-radius:8px}
+.card .rate{display:flex;align-items:baseline;justify-content:space-between;border-top:1px dashed var(--line);padding-top:14px;margin-top:4px}
+.card .rate .from{font-size:12.5px;color:var(--muted)}
+.card .rate .amt{font-size:22px;font-weight:800;color:var(--navy)}
+.card .rate .amt small{font-size:13px;font-weight:600;color:var(--muted)}
+.card .body .btn{width:100%;margin-top:16px}
+
+/* ---------- TRIP TYPES ---------- */
+.trip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.trip{position:relative;border-radius:var(--radius);overflow:hidden;min-height:230px;display:flex;align-items:flex-end;color:#fff;box-shadow:var(--shadow);transition:.2s transform}
+.trip:hover{transform:translateY(-4px)}
+.trip .bg{position:absolute;inset:0}
+.trip .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,41,66,0) 30%,rgba(11,41,66,.86) 100%)}
+.trip .t{position:relative;padding:20px;z-index:2}
+.trip .t h3{font-size:19px}
+.trip .t p{font-size:13px;color:#d8e6f2;margin-top:4px}
+.trip .t .go{font-size:13px;font-weight:700;color:var(--sun);margin-top:10px;display:inline-flex;gap:6px;align-items:center}
+
+/* ---------- HOW / STEPS ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;counter-reset:s}
+.step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;position:relative}
+.step .n{width:42px;height:42px;border-radius:12px;background:linear-gradient(140deg,var(--sky),var(--deep));color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;margin-bottom:14px}
+.step h3{font-size:17px;color:var(--navy)}
+.step p{font-size:14px;color:var(--muted);margin-top:7px}
+
+/* ---------- REVIEWS ---------- */
+.reviews{background:linear-gradient(180deg,#0b2942,#0f3a5f);color:#fff}
+.rev-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.google-badge{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);padding:14px 20px;border-radius:16px}
+.google-badge .score{font-size:38px;font-weight:800;line-height:1}
+.google-badge small{color:#bcd3e8;font-size:13px}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
+.rev{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:22px}
+.rev .stars{font-size:15px}
+.rev p{font-size:15px;color:#eaf3fb;margin-top:10px}
+.rev .who{display:flex;align-items:center;gap:11px;margin-top:16px}
+.rev .who .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(140deg,var(--aqua),var(--blue));display:grid;place-items:center;font-weight:800;font-size:15px;color:#04202f}
+.rev .who b{font-size:14px}
+.rev .who span{font-size:12px;color:#a9c4dc;display:block}
+
+/* ---------- POLICY / INSURANCE ---------- */
+.policy-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
+.policy-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow)}
+.policy-item{display:flex;gap:14px;padding:16px;border-radius:12px}
+.policy-item:not(:last-child){border-bottom:1px solid var(--line)}
+.policy-item .ic{flex:0 0 auto;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#eaf3fb;color:var(--blue)}
+.policy-item h4{font-size:15.5px;color:var(--navy)}
+.policy-item p{font-size:13.5px;color:var(--muted);margin-top:3px}
+.insure{background:linear-gradient(135deg,#123a5c,#1266b8);color:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-lg)}
+.insure .pill{background:rgba(255,255,255,.16);color:#eaf4ff}
+.insure h3{font-size:24px;margin-top:14px}
+.insure ul{list-style:none;padding:0;margin:18px 0 0}
+.insure li{display:flex;gap:10px;font-size:14.5px;color:#e4eff8;padding:7px 0}
+.insure li svg{flex:0 0 auto;margin-top:3px}
+
+/* ---------- FOOTER ---------- */
+footer{background:var(--navy);color:#cbd9e6;padding:64px 0 30px}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:36px}
+footer h4{color:#fff;font-size:14px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+footer a{display:block;color:#a8bdd2;font-size:14.5px;padding:5px 0}
+footer a:hover{color:#fff}
+.foot-brand p{font-size:14px;color:#9fb6cc;margin-top:14px;max-width:280px}
+.foot-contact div{display:flex;gap:10px;font-size:14.5px;padding:6px 0;color:#cbd9e6}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:40px;padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:#8ba4bd}
+
+/* ---------- MOBILE STICKY CTA ---------- */
+.mobile-cta{display:none}
+
+/* ---------- MODAL / BOOKING FLOW ---------- */
+.overlay{position:fixed;inset:0;background:rgba(8,22,36,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:34px 16px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--bg);width:100%;max-width:760px;border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.modal-head{background:#fff;padding:20px 24px;border-bottom:1px solid var(--line);position:relative}
+.modal-head h3{font-size:19px;color:var(--navy)}
+.modal-head .close{position:absolute;right:16px;top:16px;width:38px;height:38px;border-radius:10px;background:#f1f4f8;color:var(--muted);font-size:20px}
+.modal-head .close:hover{background:#e6ebf1}
+.steps-bar{display:flex;gap:8px;margin-top:16px}
+.steps-bar .sb{flex:1;height:5px;border-radius:999px;background:#e6ecf2}
+.steps-bar .sb.active{background:var(--blue)}
+.steps-bar .sb.done{background:var(--ok)}
+.modal-body{padding:24px;max-height:62vh;overflow-y:auto}
+.modal-foot{background:#fff;border-top:1px solid var(--line);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.modal-foot .total{font-size:13px;color:var(--muted)}
+.modal-foot .total b{display:block;font-size:20px;color:var(--navy)}
+.step-pane{display:none}
+.step-pane.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.pane-title{font-size:18px;color:var(--navy);margin-bottom:4px}
+.pane-sub{font-size:14px;color:var(--muted);margin-bottom:18px}
+
+/* boat picker */
+.boat-opt{display:flex;gap:14px;align-items:center;border:1.5px solid var(--line);border-radius:14px;padding:14px;background:#fff;cursor:pointer;margin-bottom:12px;transition:.15s}
+.boat-opt:hover{border-color:var(--sky)}
+.boat-opt.sel{border-color:var(--blue);background:#f3f9ff;box-shadow:0 0 0 4px rgba(18,102,184,.1)}
+.boat-opt .thumb{width:84px;height:64px;border-radius:10px;flex:0 0 auto;overflow:hidden}
+.boat-opt .info{flex:1}
+.boat-opt .info b{font-size:15.5px;color:var(--navy)}
+.boat-opt .info span{display:block;font-size:12.5px;color:var(--muted)}
+.boat-opt .p{font-weight:800;color:var(--navy);text-align:right}
+.boat-opt .p small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+
+/* calendar */
+.cal{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-head b{font-size:15px;color:var(--navy)}
+.cal-nav{width:34px;height:34px;border-radius:9px;background:#f1f4f8;color:var(--navy);font-size:16px}
+.cal-nav:hover{background:#e6ebf1}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-grid .dow{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-weight:600;background:#f7f9fb;color:var(--ink);cursor:pointer;border:1.5px solid transparent;position:relative}
+.day:hover:not(.disabled){border-color:var(--sky)}
+.day.disabled{color:#c4ced8;cursor:not-allowed;background:#fafbfc}
+.day.sel{background:var(--blue);color:#fff}
+.day.low::after{content:"";position:absolute;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--sun)}
+.day.sel.low::after{background:#fff}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.slot{border:1.5px solid var(--line);border-radius:12px;padding:13px;text-align:left;background:#fff;cursor:pointer;transition:.15s}
+.slot:hover{border-color:var(--sky)}
+.slot.sel{border-color:var(--blue);background:#f3f9ff}
+.slot.gone{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.slot b{font-size:14.5px;color:var(--navy);display:block}
+.slot span{font-size:12px;color:var(--muted)}
+.slot .left{font-size:11px;color:var(--sun-deep);font-weight:700;margin-top:2px}
+
+/* addons */
+.addon{display:flex;gap:13px;align-items:center;border:1.5px solid var(--line);border-radius:13px;padding:14px;margin-bottom:11px;background:#fff}
+.addon .ic{width:44px;height:44px;border-radius:11px;background:#eaf3fb;display:grid;place-items:center;flex:0 0 auto;color:var(--blue)}
+.addon .info{flex:1}
+.addon .info b{font-size:15px;color:var(--navy)}
+.addon .info span{font-size:12.5px;color:var(--muted);display:block}
+.addon .info .price{font-size:13px;font-weight:700;color:var(--navy);margin-top:2px}
+.switch{position:relative;width:48px;height:28px;border-radius:999px;background:#d5dde5;flex:0 0 auto;transition:.2s;cursor:pointer}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--ok)}
+.switch.on::after{left:23px}
+.insure-highlight{border-color:var(--sun);background:linear-gradient(180deg,#fffaf0,#fff)}
+.insure-highlight .ic{background:#fff3dc;color:var(--sun-deep)}
+.rec-badge{font-size:10.5px;font-weight:800;color:var(--sun-deep);background:#fff3dc;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.05em;margin-left:8px}
+
+/* details form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .field.full{grid-column:1/-1}
+.upload{border:2px dashed #c9d6e2;border-radius:14px;padding:22px;text-align:center;background:#fbfcfe;cursor:pointer;transition:.15s}
+.upload:hover{border-color:var(--blue);background:#f5f9fd}
+.upload.done{border-color:var(--ok);background:#f0faf4}
+.upload .ic{margin:0 auto 8px}
+.upload b{font-size:14.5px;color:var(--navy)}
+.upload span{font-size:12.5px;color:var(--muted);display:block;margin-top:2px}
+.waiver-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;max-height:110px;overflow-y:auto;font-size:12.5px;color:var(--muted);margin-top:6px}
+.check-row{display:flex;gap:11px;align-items:flex-start;margin-top:14px;font-size:13.5px;color:var(--ink)}
+.check-row input{margin-top:3px;width:18px;height:18px;accent-color:var(--blue)}
+
+/* summary */
+.sum-line{display:flex;justify-content:space-between;font-size:14.5px;padding:8px 0;color:#334b62}
+.sum-line.tot{border-top:1.5px solid var(--line);margin-top:6px;padding-top:14px;font-size:17px;font-weight:800;color:var(--navy)}
+.sum-line .muted{color:var(--muted);font-size:12.5px}
+.deposit-note{background:#eaf3fb;border-radius:12px;padding:14px;font-size:13px;color:#25506f;margin-top:16px;display:flex;gap:10px}
+
+/* confirmation */
+.confirm{text-align:center;padding:20px 0}
+.confirm .badge{width:78px;height:78px;border-radius:50%;background:linear-gradient(140deg,var(--ok),#2bd07a);display:grid;place-items:center;margin:0 auto 18px;animation:pop .4s ease}
+.confirm h3{font-size:24px;color:var(--navy)}
+.confirm .code{display:inline-block;background:#0b2942;color:#fff;font-weight:800;letter-spacing:.14em;padding:10px 20px;border-radius:10px;margin:16px 0;font-size:16px}
+.confirm-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:left;margin-top:10px}
+
+/* toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--navy);color:#fff;padding:14px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;box-shadow:var(--shadow-lg);transition:.3s;display:flex;gap:9px;align-items:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:34px}
+  .grid-3,.rev-grid{grid-template-columns:1fr 1fr}
+  .trip-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .policy-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip-grid{grid-template-columns:1fr 1fr;gap:24px}
+}
+@media(max-width:680px){
+  .section{padding:60px 0}
+  .nav-links,.nav-cta .btn,.nav-phone span{display:none}
+  .burger{display:block}
+  .grid-3,.rev-grid,.trip-grid,.steps,.foot-grid{grid-template-columns:1fr}
+  .booker-fields{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .hero{padding:34px 0 100px}
+  .rev-grid{grid-template-columns:1fr}
+  .mobile-cta{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:55;background:#fff;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));gap:12px;align-items:center;justify-content:space-between;box-shadow:0 -8px 24px rgba(11,41,66,.1)}
+  .mobile-cta .btn{flex:1;padding:14px}
+  .mobile-cta a.call{width:52px;height:52px;border-radius:14px;background:#eaf3fb;color:var(--blue);display:grid;place-items:center;flex:0 0 auto}
+  body{padding-bottom:76px}
+  .modal-body{max-height:56vh}
+  .slots{grid-template-columns:1fr}
+  footer{padding-bottom:90px}
+  .mobile-menu.open{display:block;position:fixed;inset:70px 0 0;z-index:59;background:#fff;padding:22px}
+  .mobile-menu.open a{display:block;font-size:18px;font-weight:700;color:var(--navy);padding:16px 0;border-bottom:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand">
+      <span class="mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 15h18l-2.2 4.2A2 2 0 0 1 17 20H7a2 2 0 0 1-1.8-1.1L3 15Z" fill="#fff"/><path d="M6 13V6.5A1.5 1.5 0 0 1 7.5 5H14l4 8H6Z" fill="#ffd27a"/></svg>
+      </span>
+      <span>Carolina Boat Rentals<small>Lake Norman, NC</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#fleet">Our Fleet</a>
+      <a href="#trips">Trip Ideas</a>
+      <a href="#how">How It Works</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#policy">Weather Policy</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="tel:7046142118" class="nav-phone">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.58 3.6a1 1 0 0 1-.25 1L6.6 10.8Z" fill="#0b2942"/></svg>
+        <span>704-614-2118</span>
+      </a>
+      <button class="btn btn-sun" onclick="openBooking()">Book Now</button>
+      <button class="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#fleet" onclick="toggleMenu()">Our Fleet</a>
+  <a href="#trips" onclick="toggleMenu()">Trip Ideas</a>
+  <a href="#how" onclick="toggleMenu()">How It Works</a>
+  <a href="#reviews" onclick="toggleMenu()">Reviews</a>
+  <a href="#policy" onclick="toggleMenu()">Weather Policy</a>
+  <a href="tel:7046142118">📞 704-614-2118</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow" style="color:#7fd4e0">⚓ Lake Norman's #1 Rated Boat Rentals</span>
+      <h1>Pontoon relaxation.<br><span>Waverunner excitement.</span></h1>
+      <p class="sub">Book your day on Lake Norman in under 2 minutes — live availability, published rates, and instant confirmation. Captain optional. Dock delivery available.</p>
+      <div class="trust-row">
+        <div class="t"><span class="stars">★★★★★</span> <b>4.7</b> · 187 Google reviews</div>
+        <div class="t">🛟 USCG-safe fleet</div>
+        <div class="t">⚡ Instant confirmation</div>
+      </div>
+      <div class="hero-badges">
+        <span class="pill">✓ Free cancellation up to 48h</span>
+        <span class="pill">✓ Fuel &amp; life jackets included</span>
+        <span class="pill">✓ No boating license required*</span>
+      </div>
+    </div>
+
+    <!-- Booking widget -->
+    <div class="booker" id="booker">
+      <h3>Check availability &amp; book</h3>
+      <p class="muted">Real-time calendar · secure deposit hold</p>
+      <div class="booker-fields">
+        <div class="field full">
+          <label>What do you want to ride?</label>
+          <select id="hb-boat">
+            <option value="tritoon">Luxury Tritoon (up to 12)</option>
+            <option value="pontoon">Classic Pontoon (up to 10)</option>
+            <option value="waverunner">Waverunner / Jet Ski</option>
+            <option value="tour">Guided Sunset Tour</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="hb-date" />
+        </div>
+        <div class="field">
+          <label>Duration</label>
+          <select id="hb-dur">
+            <option value="half-am">Half day · AM (9–1)</option>
+            <option value="half-pm">Half day · PM (2–6)</option>
+            <option value="full">Full day (9–6)</option>
+            <option value="sunset">Sunset cruise (5–7:30)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Launch / delivery</label>
+          <select id="hb-loc">
+            <option>Blythe Landing — Huntersville</option>
+            <option>Ramsey Creek Park — Cornelius</option>
+            <option>Dock delivery to your Airbnb (+$95)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Guests</label>
+          <select id="hb-guests">
+            <option>1–4 guests</option><option>5–8 guests</option><option>9–12 guests</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-sun" onclick="openBooking(true)">Search available boats →</button>
+      <div class="booker-foot">🔒 No charge today — secure a spot with a refundable hold</div>
+    </div>
+  </div>
+  <svg class="waves" viewBox="0 0 1440 110" preserveAspectRatio="none"><path d="M0 40c180 40 360 40 540 20s360-60 540-40 260 60 360 60v30H0Z" fill="#f4f7fa"/></svg>
+</section>
+
+<!-- ============ STAT STRIP ============ -->
+<div class="strip">
+  <div class="wrap strip-grid">
+    <div class="s"><b>4.7★</b><span>187 verified reviews</span></div>
+    <div class="s"><b>12,000+</b><span>guests on the water</span></div>
+    <div class="s"><b>2 min</b><span>to book online</span></div>
+    <div class="s"><b>7 days</b><span>Apr – Oct season</span></div>
+  </div>
+</div>
+
+<!-- ============ FLEET ============ -->
+<section class="section" id="fleet">
+  <div class="wrap">
+    <span class="eyebrow">The Fleet</span>
+    <h2 style="margin-top:10px">Published rates. No phone tag.</h2>
+    <p class="lede">Every boat comes fueled, cleaned, and stocked with Coast Guard-approved life jackets for all ages. Prices below are transparent starting rates — pick a date to see live availability.</p>
+
+    <div class="grid-3" id="fleetGrid" style="margin-top:36px"><!-- boats rendered from store.js --></div>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:18px">*NC requires anyone born on or after Jan 1, 1988 to carry a Boater Education Card. First-time renters upload it at checkout in 30 seconds — we'll help if you don't have one yet.</p>
+  </div>
+</section>
+
+<!-- ============ TRIP TYPES ============ -->
+<section class="section" id="trips" style="background:#fff;border-block:1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">Plan the Perfect Day</span>
+    <h2 style="margin-top:10px">However you like the lake</h2>
+    <p class="lede">Tell us the occasion and we'll set up the boat, the route, and the extras. These are the trips our guests book most.</p>
+
+    <div class="trip-grid" style="margin-top:36px">
+      <a class="trip" onclick="openBooking(true,'tritoon')">
+        <div class="bg" style="background:linear-gradient(150deg,#ff7ea8,#c62368)"></div><div class="scrim"></div>
+        <div class="t"><h3>Bachelorette</h3><p>Tritoon + waterslide + Bluetooth for the crew.</p><span class="go">Plan it →</span></div>
+      </a>
+      <a class="trip" onclick="openBooking(true,'pontoon')">
+        <div class="bg" style="background:linear-gradient(150deg,#4fc3e8,#0f6ba8)"></div><div class="scrim"></div>
+        <div class="t"><h3>Birthday party</h3><p>Roomy pontoon, cooler, and a swim stop.</p><span class="go">Plan it →</span></div>
+      </a>
+      <a class="trip" onclick="openBooking(true,'tour')">
+        <div class="bg" style="background:linear-gradient(150deg,#ffb84d,#e0592b)"></div><div class="scrim"></div>
+        <div class="t"><h3>Sunset cruise</h3><p>Captained golden-hour tour of the coves.</p><span class="go">Plan it →</span></div>
+      </a>
+      <a class="trip" onclick="openBooking(true,'pontoon')">
+        <div class="bg" style="background:linear-gradient(150deg,#38c1c9,#0b4a63)"></div><div class="scrim"></div>
+        <div class="t"><h3>Airbnb dock delivery</h3><p>We bring the boat to your rental's dock.</p><span class="go">Plan it →</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="how">
+  <div class="wrap">
+    <span class="eyebrow">How It Works</span>
+    <h2 style="margin-top:10px">On the water in four steps</h2>
+    <div class="steps" style="margin-top:36px">
+      <div class="step"><div class="n">1</div><h3>Pick your boat &amp; date</h3><p>See live availability and transparent pricing. No waiting for a callback.</p></div>
+      <div class="step"><div class="n">2</div><h3>Sign the waiver online</h3><p>Digital waiver + boater card upload — done from your phone before you arrive.</p></div>
+      <div class="step"><div class="n">3</div><h3>Hold your spot</h3><p>A refundable deposit hold locks your reservation. Balance due at the dock.</p></div>
+      <div class="step"><div class="n">4</div><h3>Show up &amp; ride</h3><p>Quick safety briefing, then you're off. Fuel and life jackets already onboard.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="section reviews" id="reviews">
+  <div class="wrap">
+    <div class="rev-head">
+      <div>
+        <span class="eyebrow" style="color:#7fd4e0">Loved on the Lake</span>
+        <h2 style="margin-top:10px">Rated 4.7★ by 187 guests</h2>
+      </div>
+      <div class="google-badge">
+        <svg width="34" height="34" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
+        <div><div class="score">4.7 ★</div><small>187 Google reviews</small></div>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev"><div class="stars">★★★★★</div><p>"Booked the tritoon for my sister's bachelorette in five minutes online. The slide was a hit and the boat was spotless. Will 100% be back."</p><div class="who"><div class="av">MK</div><div><b>Megan K.</b><span>2 weeks ago</span></div></div></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>"They delivered the pontoon right to our Airbnb dock in Cornelius. Zero hassle, fuel was full, life jackets for the kids. Perfect family day."</p><div class="who"><div class="av">DR</div><div><b>David R.</b><span>1 month ago</span></div></div></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>"The sunset tour was gorgeous and our captain knew every cove on Lake Norman. Great value and so easy to arrange. Highly recommend."</p><div class="who"><div class="av">AL</div><div><b>Ashley L.</b><span>1 month ago</span></div></div></div>
+    </div>
+    <div style="text-align:center;margin-top:32px"><a href="#" class="btn btn-ghost">Read all 187 reviews on Google →</a></div>
+  </div>
+</section>
+
+<!-- ============ WEATHER POLICY + INSURANCE ============ -->
+<section class="section" id="policy">
+  <div class="wrap">
+    <span class="eyebrow">Book With Confidence</span>
+    <h2 style="margin-top:10px">Rain check? We've got you.</h2>
+    <p class="lede">Lake Norman weather can turn — so we made our policy simple and fair. Reschedule or refund when it counts.</p>
+
+    <div class="policy-grid" style="margin-top:36px">
+      <div class="policy-card">
+        <div class="policy-item"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 18a4 4 0 0 1-.5-7.97A6 6 0 0 1 18 9a3.5 3.5 0 0 1-.5 9H7Z" stroke="currentColor" stroke-width="1.8"/></svg></div><div><h4>Free reschedule for weather</h4><p>If we call it for storms or unsafe wind, you reschedule any open date or get a full refund — no fees, no fine print.</p></div></div>
+        <div class="policy-item"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3v3m0 12v3m9-9h-3M6 12H3m14.5-6.5-2 2m-7 7-2 2m11 0-2-2m-7-7-2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><div><h4>48-hour free cancellation</h4><p>Life happens. Cancel up to 48 hours before your slot for a full refund of your deposit hold.</p></div></div>
+        <div class="policy-item"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div><h4>Refundable deposit hold</h4><p>We authorize a hold to reserve your boat — not a charge. It's released after your trip barring damage.</p></div></div>
+      </div>
+
+      <div class="insure">
+        <span class="pill">Optional · Recommended</span>
+        <h3>Add Damage &amp; Weather Protection</h3>
+        <p style="color:#d6e6f3;margin-top:8px;font-size:15px">For $39 per booking, waive your damage deposit and get a full refund if <em>you</em> need to cancel for any reason — even day-of.</p>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#7fe0a0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel for any reason, any time</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#7fe0a0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Damage deposit waived (up to $500)</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#7fe0a0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Priority rebooking on busy weekends</li>
+        </ul>
+        <button class="btn btn-sun" style="margin-top:22px;width:100%" onclick="openBooking()">Add it at checkout</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section style="background:linear-gradient(135deg,#0b2942,#1266b8);color:#fff;text-align:center;padding:72px 0">
+  <div class="wrap">
+    <h2 style="font-size:clamp(28px,4vw,42px)">Your Lake Norman day is one tap away</h2>
+    <p style="color:#cfe2f2;font-size:18px;margin:14px auto 28px;max-width:560px">Live availability, instant confirmation, and a fleet that's ready when you are.</p>
+    <button class="btn btn-sun" style="font-size:17px;padding:17px 34px" onclick="openBooking()">Book your boat now →</button>
+    <p style="margin-top:18px;color:#9fc0dc;font-size:14px">or call us at <a href="tel:7046142118" style="color:#fff;font-weight:700">704-614-2118</a></p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="brand" style="color:#fff"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 15h18l-2.2 4.2A2 2 0 0 1 17 20H7a2 2 0 0 1-1.8-1.1L3 15Z" fill="#fff"/><path d="M6 13V6.5A1.5 1.5 0 0 1 7.5 5H14l4 8H6Z" fill="#ffd27a"/></svg></span><span style="color:#fff">Carolina Boat Rentals<small style="color:#9fb6cc">Lake Norman, NC</small></span></div>
+      <p>Pontoons, waverunners, and captained tours on Lake Norman since 2016. Locally owned, guest-obsessed, and rated 4.7★ by 187 boaters.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <a href="#fleet">Our Fleet</a><a href="#trips">Trip Ideas</a><a href="#how">How It Works</a><a href="#reviews">Reviews</a>
+    </div>
+    <div>
+      <h4>Info</h4>
+      <a href="#policy">Weather Policy</a><a href="#">Boater Education Card</a><a href="#">Rental Agreement</a><a href="#">FAQ</a>
+    </div>
+    <div class="foot-contact">
+      <h4>Get in Touch</h4>
+      <div>📞 <a href="tel:7046142118" style="padding:0;color:#cbd9e6">704-614-2118</a></div>
+      <div>📍 Cornelius, NC 28031</div>
+      <div>🚤 Launch: Blythe Landing &amp; Ramsey Creek Park</div>
+      <div>🗓️ Season: April – October, 7 days a week</div>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© 2026 Carolina Boat Rentals. All rights reserved.</span>
+    <span><a href="dashboard.html" style="color:#8ba4bd">Owner login</a> · Privacy · Terms · Accessibility</span>
+  </div>
+</footer>
+
+<!-- Mobile sticky CTA -->
+<div class="mobile-cta">
+  <a href="tel:7046142118" class="call" aria-label="Call"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.58 3.6a1 1 0 0 1-.25 1L6.6 10.8Z" fill="#1266b8"/></svg></a>
+  <button class="btn btn-sun" onclick="openBooking()">Book a boat</button>
+</div>
+
+<!-- ============ BOOKING MODAL ============ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Book your boat</h3>
+      <button class="close" onclick="closeBooking()" aria-label="Close">×</button>
+      <div class="steps-bar">
+        <div class="sb" data-s="1"></div><div class="sb" data-s="2"></div><div class="sb" data-s="3"></div><div class="sb" data-s="4"></div><div class="sb" data-s="5"></div>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- STEP 1: BOAT -->
+      <div class="step-pane" data-pane="1">
+        <div class="pane-title">Choose your boat</div>
+        <div class="pane-sub">Live inventory for Lake Norman · prices shown are for a half day.</div>
+        <div id="boatList"></div>
+      </div>
+      <!-- STEP 2: DATE & TIME -->
+      <div class="step-pane" data-pane="2">
+        <div class="pane-title">Pick a date &amp; time</div>
+        <div class="pane-sub"><span class="dot" style="display:inline-block;background:var(--sun)"></span> = limited availability. Grey dates are fully booked.</div>
+        <div class="cal">
+          <div class="cal-head"><button class="cal-nav" onclick="changeMonth(-1)">‹</button><b id="calLabel"></b><button class="cal-nav" onclick="changeMonth(1)">›</button></div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <div class="slots" id="slotList"></div>
+      </div>
+      <!-- STEP 3: ADD-ONS + INSURANCE -->
+      <div class="step-pane" data-pane="3">
+        <div class="pane-title">Add extras</div>
+        <div class="pane-sub">Make it a better day. Toggle anything on or off.</div>
+        <div id="addonList"></div>
+      </div>
+      <!-- STEP 4: DETAILS + WAIVER + BOATER ED -->
+      <div class="step-pane" data-pane="4">
+        <div class="pane-title">Your details &amp; waiver</div>
+        <div class="pane-sub">We'll text your confirmation and dock instructions here.</div>
+        <div class="form-grid">
+          <div class="field"><label>First name</label><input id="f-first" placeholder="Jamie" /></div>
+          <div class="field"><label>Last name</label><input id="f-last" placeholder="Rivera" /></div>
+          <div class="field"><label>Mobile phone</label><input id="f-phone" placeholder="(704) 555-0134" /></div>
+          <div class="field"><label>Email</label><input id="f-email" placeholder="you@email.com" /></div>
+        </div>
+
+        <div style="margin-top:20px">
+          <label class="field" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">NC Boater Education Card</label>
+          <div class="upload" id="uploader" onclick="fakeUpload()">
+            <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0 4 4m-4-4L8 8" stroke="#1266b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="#1266b8" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <b id="upTitle">Upload boater card or license photo</b>
+            <span id="upSub">Required for renters born after Jan 1, 1988 · JPG/PDF · tap to add</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px">
+          <label class="field" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Liability waiver &amp; rental agreement</label>
+          <div class="waiver-box">Renter acknowledges the inherent risks of boating and watersports on Lake Norman. Renter certifies they are at least 21 years old to operate the vessel, will not operate under the influence, and will ensure all passengers wear Coast Guard-approved life jackets as required by NC law. Renter agrees to the fuel, damage, and late-return terms and authorizes a refundable security deposit hold. Full terms provided with your confirmation and available on request…</div>
+          <label class="check-row"><input type="checkbox" id="agreeWaiver" /> <span>I have read and agree to the liability waiver and rental agreement, and I am at least 21 years old.</span></label>
+        </div>
+      </div>
+      <!-- STEP 5: DEPOSIT + CONFIRM -->
+      <div class="step-pane" data-pane="5">
+        <div id="reviewPane">
+          <div class="pane-title">Review &amp; secure your spot</div>
+          <div class="pane-sub">We authorize a refundable hold today — the balance is due at the dock.</div>
+          <div class="confirm-card" id="summary"></div>
+          <div class="deposit-note">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex:0 0 auto"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3Z" stroke="#25506f" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#25506f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Secure deposit hold.</b> We place a temporary authorization to reserve your boat — not a charge. It's released after your trip. Card entry is handled on our PCI-compliant, encrypted checkout.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="total">Estimated total<b id="footTotal">$0</b></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-line" id="backBtn" onclick="prevStep()" style="display:none">Back</button>
+        <button class="btn btn-sun" id="nextBtn" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="store.js"></script>
+<script>
+/* ---------------- DATA (fleet comes from the owner dashboard via store.js) ---------------- */
+let FLEET = [];            // array of boat objects from CBR store
+let BOATS = {};            // same, keyed by id for the booking modal
+const STATUS_COLOR = {available:"var(--ok)", limited:"var(--sun-deep)", soldout:"var(--muted)"};
+
+function loadFleet(){
+  FLEET = CBR.getBoats();
+  BOATS = {};
+  FLEET.forEach(b=>BOATS[b.id]=b);
+  renderFleetCards();
+  renderHeroSelect();
+}
+function renderFleetCards(){
+  const el = document.getElementById("fleetGrid");
+  if(!el) return;
+  el.innerHTML = FLEET.map(b=>{
+    const sold = b.status==="soldout";
+    const tags = (b.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("");
+    return `<article class="card">
+      <div class="media" style="background:${CBR.bg(b.image)}">
+        <div class="avail" style="color:${STATUS_COLOR[b.status]||'var(--ok)'}">${sold?'':'<span class="dot"></span> '}${b.statusText||'Available'}</div>
+        <div class="price-tag">From ${CBR.money(b.half)} / half day</div>
+      </div>
+      <div class="body">
+        <h3>${b.name}</h3>
+        <div class="cap">${tags}</div>
+        <p style="font-size:14px;color:var(--muted)">${b.desc||''}</p>
+        <div class="rate"><span class="from">Starting at</span><span class="amt">${CBR.money(b.half)}<small> /half · ${CBR.money(b.full)} full</small></span></div>
+        <button class="btn ${sold?'btn-line':'btn-navy'}" ${sold?'disabled style="opacity:.55;cursor:not-allowed"':`onclick="openBooking(true,'${b.id}')"`}>${sold?'Fully booked':'Check dates'}</button>
+      </div>
+    </article>`;
+  }).join("");
+}
+function renderHeroSelect(){
+  const sel = document.getElementById("hb-boat");
+  if(!sel) return;
+  sel.innerHTML = FLEET.filter(b=>b.status!=="soldout")
+    .map(b=>`<option value="${b.id}">${b.name} — from ${CBR.money(b.half)}</option>`).join("");
+}
+const ADDONS = [
+  {id:"insurance", name:"Damage & Weather Protection", sub:"Cancel any reason + deposit waived", price:39, icon:"🛡️", rec:true},
+  {id:"captain",   name:"Add a licensed captain",       sub:"Sit back — we'll drive (4 hrs)",   price:199, icon:"🧭"},
+  {id:"tube",      name:"Towable tube + rope",          sub:"Big-kid fun behind the boat",       price:49,  icon:"🌀"},
+  {id:"cooler",    name:"Stocked cooler + ice",         sub:"Water, sodas & ice ready to go",    price:35,  icon:"🧊"},
+  {id:"delivery",  name:"Dock delivery to your Airbnb", sub:"We bring the boat to you",          price:95,  icon:"🚚"}
+];
+const TIME_SLOTS = [
+  {id:"am",  label:"Morning · 9:00–1:00",  sub:"Half day",  mult:1,    left:3},
+  {id:"pm",  label:"Afternoon · 2:00–6:00",sub:"Half day",  mult:1,    left:1},
+  {id:"full",label:"Full day · 9:00–6:00", sub:"Best value",mult:1.6,  left:2},
+  {id:"sun", label:"Sunset · 5:00–7:30",   sub:"Captained", mult:0.85, left:0}
+];
+
+/* ---------------- STATE ---------------- */
+let step = 1;
+let calMonth = new Date(2026,6,1); // July 2026
+const state = {boat:"tritoon", date:null, dateLabel:"", slot:null, addons:{insurance:true}, uploaded:false};
+
+/* ---------------- HELPERS ---------------- */
+const $ = s=>document.querySelector(s);
+const money = n=>"$"+n.toLocaleString();
+function toast(msg){const t=$("#toast");t.innerHTML="✓ "+msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600);}
+function toggleMenu(){$("#mobileMenu").classList.toggle("open");}
+
+/* ---------------- OPEN / CLOSE ---------------- */
+function openBooking(skipToDate,boat){
+  if(boat) state.boat=boat;
+  else {const hb=$("#hb-boat"); if(hb) state.boat=hb.value;}
+  if(!BOATS[state.boat]) state.boat = FLEET.length?FLEET[0].id:null; // guard removed boats
+  document.body.style.overflow="hidden";
+  $("#overlay").classList.add("open");
+  $("#mobileMenu").classList.remove("open");
+  step = skipToDate ? 2 : 1;
+  renderBoats(); renderCalendar(); renderAddons();
+  showStep();
+}
+function closeBooking(){document.body.style.overflow="";$("#overlay").classList.remove("open");}
+$("#overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeBooking();});
+
+/* ---------------- STEP 1: BOATS ---------------- */
+function renderBoats(){
+  $("#boatList").innerHTML = Object.entries(BOATS).map(([k,b])=>`
+    <div class="boat-opt ${state.boat===k?'sel':''}" onclick="pickBoat('${k}')">
+      <div class="thumb" style="background:${CBR.bg(b.image)}"></div>
+      <div class="info"><b>${b.name}</b><span>${b.sub}</span></div>
+      <div class="p">${money(b.half)}<small>half day</small></div>
+    </div>`).join("");
+}
+function pickBoat(k){state.boat=k;renderBoats();updateTotal();}
+
+/* ---------------- STEP 2: CALENDAR ---------------- */
+function changeMonth(d){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+d,1);renderCalendar();}
+function renderCalendar(){
+  const y=calMonth.getFullYear(), m=calMonth.getMonth();
+  $("#calLabel").textContent = calMonth.toLocaleString("en-US",{month:"long",year:"numeric"});
+  const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  const today=new Date(2026,6,14);
+  let html=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="dow">${d}</div>`).join("");
+  for(let i=0;i<first;i++)html+=`<div></div>`;
+  for(let d=1;d<=days;d++){
+    const date=new Date(y,m,d);
+    const past = date < today;
+    const booked = (d%13===0); // a few fully-booked days
+    const low = ([5,6,12,19,20,26].includes(d)); // limited
+    const disabled = past || booked || m!==6; // season demo: only July bookable
+    const sel = state.date && state.date.getTime()===date.getTime();
+    html+=`<div class="day ${disabled?'disabled':''} ${low?'low':''} ${sel?'sel':''}" ${disabled?'':`onclick="pickDate(${y},${m},${d})"`}>${d}</div>`;
+  }
+  $("#calGrid").innerHTML=html;
+  renderSlots();
+}
+function pickDate(y,m,d){
+  state.date=new Date(y,m,d);
+  state.dateLabel=state.date.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+  renderCalendar();
+}
+function renderSlots(){
+  if(!state.date){$("#slotList").innerHTML=`<div style="grid-column:1/-1;color:var(--muted);font-size:14px;padding:8px 2px">↑ Select a date to see time slots</div>`;return;}
+  $("#slotList").innerHTML = TIME_SLOTS.map(s=>{
+    const gone = s.left===0;
+    const sel = state.slot===s.id;
+    return `<button class="slot ${sel?'sel':''} ${gone?'gone':''}" ${gone?'disabled':`onclick="pickSlot('${s.id}')"`}>
+      <b>${s.label}</b><span>${s.sub}</span>${gone?'<div class="left" style="color:var(--muted)">Sold out</div>':(s.left<=1?`<div class="left">Only ${s.left} left!</div>`:'')}</button>`;
+  }).join("");
+}
+function pickSlot(id){state.slot=id;renderSlots();updateTotal();}
+
+/* ---------------- STEP 3: ADD-ONS ---------------- */
+function renderAddons(){
+  $("#addonList").innerHTML = ADDONS.map(a=>`
+    <div class="addon ${a.rec?'insure-highlight':''}">
+      <div class="ic" style="font-size:20px">${a.icon}</div>
+      <div class="info"><b>${a.name}${a.rec?'<span class="rec-badge">Recommended</span>':''}</b><span>${a.sub}</span><div class="price">+ ${money(a.price)}</div></div>
+      <div class="switch ${state.addons[a.id]?'on':''}" onclick="toggleAddon('${a.id}')"></div>
+    </div>`).join("");
+}
+function toggleAddon(id){state.addons[id]=!state.addons[id];renderAddons();updateTotal();}
+
+/* ---------------- STEP 4: UPLOAD ---------------- */
+function fakeUpload(){
+  state.uploaded=true;
+  $("#uploader").classList.add("done");
+  $("#upTitle").textContent="✓ boater-card.jpg uploaded";
+  $("#upSub").textContent="Looks good — we'll verify before your trip.";
+  toast("Boater card received");
+}
+
+/* ---------------- TOTALS ---------------- */
+function calcTotal(){
+  const b=BOATS[state.boat];
+  let base = b.half;
+  if(state.slot){const s=TIME_SLOTS.find(x=>x.id===state.slot); base=Math.round(b.half*s.mult);}
+  let addons=0; ADDONS.forEach(a=>{if(state.addons[a.id])addons+=a.price;});
+  const subtotal=base+addons;
+  const deposit=Math.round(subtotal*0.3);
+  return {base,addons,subtotal,deposit,b};
+}
+function updateTotal(){$("#footTotal").textContent=money(calcTotal().subtotal);}
+
+/* ---------------- STEP 5: SUMMARY ---------------- */
+function renderSummary(){
+  const t=calcTotal();
+  const slot=state.slot?TIME_SLOTS.find(x=>x.id===state.slot).label:"—";
+  let rows=`
+    <div class="sum-line"><span>${t.b.name}</span><b>${money(t.base)}</b></div>
+    <div class="sum-line"><span class="muted">${state.dateLabel||'Date TBD'} · ${slot}</span><span></span></div>`;
+  ADDONS.forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
+  rows+=`
+    <div class="sum-line tot"><span>Trip total</span><span>${money(t.subtotal)}</span></div>
+    <div class="sum-line"><span class="muted">Refundable hold today (30%)</span><span class="muted">${money(t.deposit)}</span></div>
+    <div class="sum-line"><span class="muted">Balance due at dock</span><span class="muted">${money(t.subtotal-t.deposit)}</span></div>`;
+  $("#summary").innerHTML=rows;
+}
+
+/* ---------------- CONFIRMATION ---------------- */
+function confirmBooking(){
+  const code="CBR-"+Math.random().toString(36).slice(2,7).toUpperCase();
+  const t=calcTotal();
+  const slot=state.slot?TIME_SLOTS.find(x=>x.id===state.slot).label:"";
+  // Record the rental so it shows up in the owner dashboard.
+  CBR.addBooking({
+    code, name:(($("#f-first").value||"")+" "+($("#f-last").value||"")).trim()||"Guest",
+    phone:$("#f-phone").value||"", email:$("#f-email").value||"",
+    boatId:state.boat, boatName:t.b.name,
+    date: state.date?state.date.toISOString().slice(0,10):"", dateLabel: state.dateLabel||"",
+    slot, subtotal:t.subtotal, deposit:t.deposit,
+    status:"confirmed", createdAt:new Date().toISOString().slice(0,10)
+  });
+  $("#modalTitle").textContent="You're booked!";
+  document.querySelector(".steps-bar").style.display="none";
+  $("#modalBody").innerHTML=`
+    <div class="confirm">
+      <div class="badge"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Reservation confirmed</h3>
+      <p style="color:var(--muted);margin-top:8px">A text and email confirmation is on its way. See you on Lake Norman!</p>
+      <div class="code">${code}</div>
+      <div class="confirm-card">
+        <div class="sum-line"><span>${t.b.name}</span><b>${money(t.subtotal)}</b></div>
+        <div class="sum-line"><span class="muted">${state.dateLabel} · ${slot}</span></div>
+        <div class="sum-line"><span class="muted">Launch: Blythe Landing, Huntersville</span></div>
+        <div class="sum-line tot"><span>Deposit held</span><span style="color:var(--ok)">${money(t.deposit)} ✓</span></div>
+        <div class="sum-line"><span class="muted">Balance at dock</span><span class="muted">${money(t.subtotal-t.deposit)}</span></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:14px">Need to change something? Reply to your confirmation text or call 704-614-2118.</p>
+    </div>`;
+  $("#modalFootReplace");
+  document.querySelector(".modal-foot").innerHTML=`<button class="btn btn-navy" style="width:100%" onclick="closeBooking();location.reload()">Done</button>`;
+}
+
+/* ---------------- STEP NAV ---------------- */
+function showStep(){
+  document.querySelectorAll(".step-pane").forEach(p=>p.classList.toggle("active", +p.dataset.pane===step));
+  document.querySelectorAll(".steps-bar .sb").forEach(sb=>{
+    const n=+sb.dataset.s; sb.classList.toggle("active",n===step); sb.classList.toggle("done",n<step);
+  });
+  const titles={1:"Choose your boat",2:"Date & time",3:"Add extras",4:"Details & waiver",5:"Review & confirm"};
+  $("#modalTitle").textContent=titles[step];
+  $("#backBtn").style.display = step>1?"inline-flex":"none";
+  $("#nextBtn").textContent = step===5?"Confirm & hold spot 🔒":"Continue →";
+  if(step===5)renderSummary();
+  updateTotal();
+  $("#modalBody").scrollTop=0;
+}
+function nextStep(){
+  // light validation
+  if(step===2 && (!state.date||!state.slot)){toast("Pick a date and time slot");return;}
+  if(step===4){
+    if(!$("#f-first").value||!$("#f-phone").value){toast("Add your name and phone");return;}
+    if(!$("#agreeWaiver").checked){toast("Please agree to the waiver");return;}
+    if(!state.uploaded){toast("Upload your boater card to continue");return;}
+  }
+  if(step===5){confirmBooking();return;}
+  step++; showStep();
+}
+function prevStep(){if(step>1){step--;showStep();}}
+$("#hb-boat")&&$("#hb-boat").addEventListener("change",e=>state.boat=e.target.value);
+
+// init hero date default
+(function(){const d=$("#hb-date"); if(d){const t=new Date(2026,6,18);d.value=t.toISOString().slice(0,10);d.min="2026-07-14";}})();
+
+// Load fleet from the owner dashboard store, and refresh if the owner edits it in another tab.
+loadFleet();
+window.addEventListener("storage", e=>{ if(e.key==="cbr_boats_v2") loadFleet(); });
+</script>
+</body>
+</html>

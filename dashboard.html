@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Owner Dashboard — Carolina Boat Rentals</title>
+<style>
+:root{
+  --navy:#0b2942;--deep:#0f3a5f;--blue:#1266b8;--sky:#2e9fe0;--aqua:#38c1c9;
+  --sun:#ffb020;--sun-deep:#f59300;--ink:#0c1b28;--muted:#5d7186;--line:#e4e9ef;
+  --bg:#eef2f6;--paper:#ffffff;--ok:#1f9d55;--ok-bg:#e7f6ee;--warn:#b7791f;--warn-bg:#fdf3e0;
+  --shadow:0 8px 24px rgba(11,41,66,.09);--shadow-lg:0 24px 60px rgba(11,41,66,.22);
+  --radius:14px;--font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{margin:0;letter-spacing:-.02em;font-weight:800;line-height:1.15}
+p{margin:0}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit}
+a{color:inherit;text-decoration:none}
+.hidden{display:none!important}
+
+/* ---------- LOGIN ---------- */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(1000px 500px at 80% -10%,rgba(56,193,201,.25),transparent 60%),linear-gradient(180deg,#0b2942,#0f3a5f 60%,#155886)}
+.login-card{width:100%;max-width:400px;background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);padding:34px 30px}
+.login-brand{display:flex;align-items:center;gap:11px;font-weight:800;color:var(--navy);font-size:18px;margin-bottom:6px}
+.login-brand .mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(140deg,var(--sky),var(--deep));display:grid;place-items:center}
+.login-card h1{font-size:22px;margin-top:18px}
+.login-card p.sub{color:var(--muted);font-size:14px;margin-top:5px}
+.lf{margin-top:18px}
+.lf label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:6px}
+.lf input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;background:#fbfcfe}
+.lf input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(18,102,184,.12);background:#fff}
+.login-btn{width:100%;margin-top:20px;padding:14px;border-radius:11px;background:linear-gradient(180deg,var(--sun),var(--sun-deep));color:#3a2500;font-weight:800;font-size:15px}
+.login-err{color:#c0392b;font-size:13px;font-weight:600;margin-top:12px;min-height:16px}
+.demo-hint{margin-top:18px;background:#eaf3fb;border-radius:11px;padding:12px 14px;font-size:12.5px;color:#25506f}
+.demo-hint b{color:var(--navy)}
+
+/* ---------- SHELL ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.tb-brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--navy);font-size:16px}
+.tb-brand .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,var(--sky),var(--deep));display:grid;place-items:center}
+.tb-brand small{display:block;font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-btn{font-size:13.5px;font-weight:700;padding:9px 14px;border-radius:10px;border:1.5px solid var(--line);color:var(--navy);background:#fff}
+.tb-btn:hover{border-color:var(--blue);color:var(--blue)}
+.tb-btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tb-btn.primary:hover{background:#123a5c}
+.main{max-width:1200px;margin:0 auto;padding:28px 24px 80px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+.page-head h1{font-size:26px}
+.page-head p{color:var(--muted);font-size:14.5px;margin-top:4px}
+
+/* ---------- STAT TILES ---------- */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.tile .lab{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:flex;align-items:center;gap:7px}
+.tile .val{font-size:30px;font-weight:800;color:var(--navy);margin-top:8px;letter-spacing:-.03em}
+.tile .sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.tile .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px}
+
+/* ---------- PANELS ---------- */
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:22px;overflow:hidden}
+.panel-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.panel-head h2{font-size:17px;color:var(--navy)}
+.panel-head p{font-size:13px;color:var(--muted);margin-top:2px}
+.panel-body{padding:22px}
+
+.cols{display:grid;grid-template-columns:1.55fr 1fr;gap:22px;align-items:start}
+
+/* ---------- CHART ---------- */
+.bars{display:flex;flex-direction:column;gap:14px}
+.bar-row{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:12px}
+.bar-row .nm{font-size:13.5px;font-weight:600;color:#33485e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:26px;background:#f1f5f9;border-radius:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--sky),var(--blue));min-width:4px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.bar-row .amt{font-size:13.5px;font-weight:800;color:var(--navy)}
+
+/* ---------- TABLE ---------- */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:0 16px 12px;border-bottom:1px solid var(--line)}
+td{padding:14px 16px;border-bottom:1px solid #eef2f6;font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafcfe}
+.guest b{color:var(--navy)}
+.guest span{display:block;font-size:12px;color:var(--muted)}
+.money{font-weight:800;color:var(--navy)}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px}
+.status.confirmed{color:var(--blue);background:#eaf3fb}
+.status.completed{color:var(--ok);background:var(--ok-bg)}
+.status.cancelled{color:#c0392b;background:#fdecea}
+.status .d{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* ---------- FLEET MANAGER ---------- */
+.fleet-list{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.boat-row{display:flex;gap:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.boat-row .thumb{width:96px;height:74px;border-radius:9px;flex:0 0 auto;background-size:cover;background-position:center}
+.boat-row .bi{flex:1;min-width:0}
+.boat-row .bi b{font-size:15px;color:var(--navy)}
+.boat-row .bi .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.boat-row .bi .rate{font-size:13px;font-weight:700;color:var(--navy);margin-top:6px}
+.boat-row .acts{display:flex;flex-direction:column;gap:6px;justify-content:center}
+.mini{font-size:12px;font-weight:700;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);color:var(--navy);white-space:nowrap}
+.mini:hover{border-color:var(--blue);color:var(--blue)}
+.mini.danger:hover{border-color:#c0392b;color:#c0392b}
+.chip{display:inline-flex;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-top:6px}
+.chip.available{color:var(--ok);background:var(--ok-bg)}
+.chip.limited{color:var(--warn);background:var(--warn-bg)}
+.chip.soldout{color:var(--muted);background:#eef2f6}
+
+/* ---------- MODAL ---------- */
+.overlay{position:fixed;inset:0;background:rgba(8,22,36,.6);backdrop-filter:blur(4px);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:#fff;width:100%;max-width:560px;border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;animation:pop .22s ease}
+@keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:18px;color:var(--navy)}
+.modal-head .x{width:36px;height:36px;border-radius:10px;background:#f1f4f8;color:var(--muted);font-size:19px}
+.modal-body{padding:24px;max-height:66vh;overflow-y:auto}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
+.btn{font-weight:700;font-size:14.5px;padding:12px 20px;border-radius:11px}
+.btn-line{border:1.5px solid var(--line);color:var(--navy);background:#fff}
+.btn-line:hover{border-color:var(--blue);color:var(--blue)}
+.btn-sun{background:linear-gradient(180deg,var(--sun),var(--sun-deep));color:#3a2500}
+.btn-navy{background:var(--navy);color:#fff}
+
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg .full{grid-column:1/-1}
+.f label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:6px}
+.f input,.f select,.f textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14.5px;background:#fbfcfe}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(18,102,184,.12);background:#fff}
+.f textarea{resize:vertical;min-height:64px}
+.f .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+.imgpick{border:2px dashed #c9d6e2;border-radius:12px;padding:14px;text-align:center;cursor:pointer;background:#fbfcfe;display:flex;gap:14px;align-items:center;text-align:left}
+.imgpick:hover{border-color:var(--blue)}
+.imgpick .prev{width:80px;height:60px;border-radius:9px;flex:0 0 auto;background-size:cover;background-position:center;border:1px solid var(--line)}
+.imgpick b{font-size:13.5px;color:var(--navy)}
+.imgpick span{font-size:12px;color:var(--muted);display:block}
+
+/* toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--navy);color:#fff;padding:13px 20px;border-radius:11px;font-size:14px;font-weight:600;z-index:90;box-shadow:var(--shadow-lg);transition:.3s}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){
+  .tiles{grid-template-columns:1fr 1fr}
+  .cols{grid-template-columns:1fr}
+  .fleet-list{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .tiles{grid-template-columns:1fr 1fr}
+  .fg{grid-template-columns:1fr}
+  .main{padding:20px 14px 60px}
+  .topbar{padding:0 14px}
+  .tb-brand small{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div class="login" id="loginView">
+  <form class="login-card" id="loginForm" onsubmit="return doLogin(event)">
+    <div class="login-brand">
+      <span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 15h18l-2.2 4.2A2 2 0 0 1 17 20H7a2 2 0 0 1-1.8-1.1L3 15Z" fill="#fff"/><path d="M6 13V6.5A1.5 1.5 0 0 1 7.5 5H14l4 8H6Z" fill="#ffd27a"/></svg></span>
+      Carolina Boat Rentals
+    </div>
+    <h1>Owner Dashboard</h1>
+    <p class="sub">Sign in to manage your fleet and bookings.</p>
+    <div class="lf"><label>Username</label><input id="u" autocomplete="username" placeholder="owner" /></div>
+    <div class="lf"><label>Password</label><input id="p" type="password" autocomplete="current-password" placeholder="••••••••" /></div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" type="submit">Sign in</button>
+    <div class="demo-hint">🔑 <b>Demo login</b> — username <b>owner</b> · password <b>lakenorman</b>. Prototype gate only, not real security.</div>
+  </form>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="appView" class="hidden">
+  <div class="topbar">
+    <div class="tb-brand">
+      <span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 15h18l-2.2 4.2A2 2 0 0 1 17 20H7a2 2 0 0 1-1.8-1.1L3 15Z" fill="#fff"/><path d="M6 13V6.5A1.5 1.5 0 0 1 7.5 5H14l4 8H6Z" fill="#ffd27a"/></svg></span>
+      <span>Carolina Boat Rentals<small>Owner Console</small></span>
+    </div>
+    <div class="tb-right">
+      <a class="tb-btn" href="index.html" target="_blank">View public site ↗</a>
+      <button class="tb-btn" onclick="resetDemo()">Reset demo</button>
+      <button class="tb-btn primary" onclick="logout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="page-head">
+      <div>
+        <h1>Good morning, Captain 👋</h1>
+        <p>Here's what's happening on Lake Norman this season.</p>
+      </div>
+      <button class="tb-btn primary" onclick="openBoat()">+ Add a boat</button>
+    </div>
+
+    <!-- Metrics -->
+    <div class="tiles" id="tiles"></div>
+
+    <div class="cols">
+      <!-- Recent rentals -->
+      <div class="panel">
+        <div class="panel-head">
+          <div><h2>Recent rentals</h2><p>Everyone who's booked — newest first.</p></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Guest</th><th>Boat</th><th>Trip date</th><th>Total</th><th>Deposit</th><th>Status</th></tr></thead>
+            <tbody id="rentalRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Revenue by boat -->
+      <div class="panel">
+        <div class="panel-head"><div><h2>Revenue by boat</h2><p>Booked this season</p></div></div>
+        <div class="panel-body"><div class="bars" id="revBars"></div></div>
+      </div>
+    </div>
+
+    <!-- Fleet manager -->
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>Your fleet</h2><p>Edits here update the public booking site instantly.</p></div>
+        <button class="tb-btn primary" onclick="openBoat()">+ Add a boat</button>
+      </div>
+      <div class="panel-body"><div class="fleet-list" id="fleetList"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BOAT EDITOR MODAL ============ -->
+<div class="overlay" id="boatOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3 id="boatModalTitle">Add a boat</h3><button class="x" onclick="closeBoat()">×</button></div>
+    <div class="modal-body">
+      <div class="fg">
+        <div class="f full"><label>Boat name</label><input id="b-name" placeholder="e.g. Double-Decker Party Barge" /></div>
+        <div class="f full"><label>Short tagline</label><input id="b-sub" placeholder="Up to 14 · slide + upper deck" /><div class="hint">Shown under the name in the booking picker.</div></div>
+        <div class="f full"><label>Description</label><textarea id="b-desc" placeholder="A sentence or two that sells the experience."></textarea></div>
+        <div class="f"><label>Capacity</label><input id="b-cap" type="number" min="1" placeholder="12" /></div>
+        <div class="f"><label>Status</label>
+          <select id="b-status">
+            <option value="available">Available</option>
+            <option value="limited">Limited availability</option>
+            <option value="soldout">Fully booked</option>
+          </select>
+        </div>
+        <div class="f"><label>Half-day rate ($)</label><input id="b-half" type="number" min="0" placeholder="499" /></div>
+        <div class="f"><label>Full-day rate ($)</label><input id="b-full" type="number" min="0" placeholder="799" /></div>
+        <div class="f full"><label>Availability note</label><input id="b-statusText" placeholder="3 left this week" /></div>
+        <div class="f full"><label>Characteristics</label><input id="b-tags" placeholder="👥 Up to 12, ⚡ 250 HP, 🔊 Bluetooth, 🪜 Waterslide" /><div class="hint">Comma-separated. These show as tags on the boat card.</div></div>
+        <div class="f full">
+          <label>Photo</label>
+          <div class="imgpick" onclick="document.getElementById('b-file').click()">
+            <div class="prev" id="b-prev" style="background:linear-gradient(135deg,#2e9fe0,#0f3a5f)"></div>
+            <div><b id="b-prev-t">Upload a boat photo</b><span>JPG or PNG · click to choose · optional (a color is used otherwise)</span></div>
+          </div>
+          <input id="b-file" type="file" accept="image/*" class="hidden" onchange="pickImage(event)" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-line" onclick="closeBoat()">Cancel</button>
+      <button class="btn btn-sun" onclick="saveBoat()">Save boat</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="store.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const AUTH_KEY="cbr_auth";
+const CREDS={user:"owner",pass:"lakenorman"};
+const TODAY="2026-07-14";
+let editingImage=null, editingId=null;
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400);}
+
+/* ---------------- AUTH ---------------- */
+function doLogin(e){
+  e.preventDefault();
+  const u=$("#u").value.trim(), p=$("#p").value;
+  if(u===CREDS.user && p===CREDS.pass){ sessionStorage.setItem(AUTH_KEY,"1"); showApp(); }
+  else { $("#loginErr").textContent="Incorrect username or password. Try the demo login below."; }
+  return false;
+}
+function logout(){ sessionStorage.removeItem(AUTH_KEY); $("#appView").classList.add("hidden"); $("#loginView").classList.remove("hidden"); $("#p").value=""; }
+function showApp(){ $("#loginView").classList.add("hidden"); $("#appView").classList.remove("hidden"); renderAll(); }
+function resetDemo(){ if(confirm("Reset all demo boats and bookings to defaults?")){ CBR.resetAll(); renderAll(); toast("Demo data reset"); } }
+
+/* ---------------- RENDER ---------------- */
+function renderAll(){ renderTiles(); renderRentals(); renderRevBars(); renderFleet(); }
+
+function renderTiles(){
+  const bk=CBR.getBookings();
+  const revenue=bk.reduce((s,b)=>s+ (b.subtotal||0),0);
+  const deposits=bk.reduce((s,b)=>s+ (b.deposit||0),0);
+  const upcoming=bk.filter(b=>b.date>=TODAY && b.status!=="cancelled").length;
+  const avg=bk.length?Math.round(revenue/bk.length):0;
+  const tiles=[
+    {lab:"Booked revenue",val:CBR.money(revenue),sub:`${bk.length} bookings this season`,ic:"💰",bg:"#e7f6ee"},
+    {lab:"Deposits held",val:CBR.money(deposits),sub:"Refundable authorizations",ic:"🛡️",bg:"#eaf3fb"},
+    {lab:"Upcoming trips",val:upcoming,sub:"Confirmed & on the calendar",ic:"📅",bg:"#fef0e0"},
+    {lab:"Avg. booking",val:CBR.money(avg),sub:"Across all rentals",ic:"📈",bg:"#eef0ff"}
+  ];
+  $("#tiles").innerHTML=tiles.map(t=>`
+    <div class="tile">
+      <div class="lab"><span class="ic" style="background:${t.bg}">${t.ic}</span>${t.lab}</div>
+      <div class="val">${t.val}</div>
+      <div class="sub">${t.sub}</div>
+    </div>`).join("");
+}
+
+function renderRentals(){
+  const bk=CBR.getBookings();
+  $("#rentalRows").innerHTML=bk.map(b=>`
+    <tr>
+      <td class="guest"><b>${b.name}</b><span>${b.phone||b.email||""}</span></td>
+      <td>${b.boatName}</td>
+      <td>${b.dateLabel||b.date}<div style="font-size:12px;color:var(--muted)">${(b.slot||"").split(" · ")[0]}</div></td>
+      <td class="money">${CBR.money(b.subtotal||0)}</td>
+      <td>${CBR.money(b.deposit||0)}</td>
+      <td><span class="status ${b.status||'confirmed'}"><span class="d"></span>${(b.status||'confirmed').replace(/^\w/,c=>c.toUpperCase())}</span></td>
+    </tr>`).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px">No bookings yet.</td></tr>`;
+}
+
+function renderRevBars(){
+  const bk=CBR.getBookings(), byBoat={};
+  bk.forEach(b=>{ byBoat[b.boatName]=(byBoat[b.boatName]||0)+(b.subtotal||0); });
+  const rows=Object.entries(byBoat).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(1,...rows.map(r=>r[1]));
+  $("#revBars").innerHTML=rows.map(([nm,v])=>`
+    <div class="bar-row">
+      <div class="nm" title="${nm}">${nm}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4,v/max*100)}%"></div></div>
+      <div class="amt">${CBR.money(v)}</div>
+    </div>`).join("") || `<p style="color:var(--muted);font-size:14px">No revenue yet.</p>`;
+}
+
+function renderFleet(){
+  const boats=CBR.getBoats();
+  $("#fleetList").innerHTML=boats.map(b=>`
+    <div class="boat-row">
+      <div class="thumb" style="background:${CBR.bg(b.image)}"></div>
+      <div class="bi">
+        <b>${b.name}</b>
+        <div class="meta">${b.sub||''}</div>
+        <div class="rate">${CBR.money(b.half)} half · ${CBR.money(b.full)} full</div>
+        <span class="chip ${b.status}">${b.status==='soldout'?'Fully booked':(b.status==='limited'?'Limited':'Available')}</span>
+      </div>
+      <div class="acts">
+        <button class="mini" onclick="openBoat('${b.id}')">Edit</button>
+        <button class="mini danger" onclick="removeBoat('${b.id}')">Remove</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ---------------- BOAT EDITOR ---------------- */
+function openBoat(id){
+  editingId=id||null; editingImage=null;
+  const b = id ? CBR.getBoats().find(x=>x.id===id) : null;
+  $("#boatModalTitle").textContent = b?("Edit "+b.name):"Add a boat";
+  $("#b-name").value=b?b.name:"";
+  $("#b-sub").value=b?b.sub||"":"";
+  $("#b-desc").value=b?b.desc||"":"";
+  $("#b-cap").value=b?b.capacity||"":"";
+  $("#b-status").value=b?b.status||"available":"available";
+  $("#b-half").value=b?b.half:"";
+  $("#b-full").value=b?b.full:"";
+  $("#b-statusText").value=b?b.statusText||"":"";
+  $("#b-tags").value=b?(b.tags||[]).join(", "):"";
+  const img=b?b.image:"linear-gradient(135deg,#2e9fe0,#0f3a5f)";
+  $("#b-prev").style.background=CBR.bg(img);
+  $("#b-prev-t").textContent = b&&CBR.isImage(b.image)?"Photo set — click to change":"Upload a boat photo";
+  editingImage = b?b.image:null;
+  $("#b-file").value="";
+  $("#boatOverlay").classList.add("open");
+}
+function closeBoat(){ $("#boatOverlay").classList.remove("open"); }
+$("#boatOverlay").addEventListener("click",e=>{if(e.target.id==="boatOverlay")closeBoat();});
+
+function pickImage(e){
+  const file=e.target.files[0]; if(!file) return;
+  if(file.size>2.5*1024*1024){ toast("Image too large — pick one under 2.5 MB"); return; }
+  const r=new FileReader();
+  r.onload=()=>{ editingImage=r.result; $("#b-prev").style.background=CBR.bg(r.result); $("#b-prev-t").textContent="Photo set — click to change"; };
+  r.readAsDataURL(file);
+}
+
+function saveBoat(){
+  const name=$("#b-name").value.trim();
+  const half=parseInt($("#b-half").value,10), full=parseInt($("#b-full").value,10);
+  if(!name){ toast("Give the boat a name"); return; }
+  if(!half||!full){ toast("Add half-day and full-day rates"); return; }
+  const palette=["linear-gradient(135deg,#2e9fe0,#0f3a5f)","linear-gradient(135deg,#38c1c9,#123a5c)","linear-gradient(135deg,#ffb020,#f59300)","linear-gradient(135deg,#8a63d2,#3b1e73)"];
+  const tags=$("#b-tags").value.split(",").map(s=>s.trim()).filter(Boolean);
+  const boat={
+    id: editingId || CBR.slug(name),
+    name, sub:$("#b-sub").value.trim(), desc:$("#b-desc").value.trim(),
+    capacity: parseInt($("#b-cap").value,10)||null,
+    half, full, tags,
+    status:$("#b-status").value, statusText:$("#b-statusText").value.trim()|| (({available:"Available",limited:"Limited availability",soldout:"Fully booked"})[$("#b-status").value]),
+    image: editingImage || palette[Math.floor(Math.random()*palette.length)]
+  };
+  if(editingId){ CBR.updateBoat(boat); toast(name+" updated"); }
+  else { CBR.addBoat(boat); toast(name+" added to your fleet"); }
+  closeBoat(); renderAll();
+}
+function removeBoat(id){
+  const b=CBR.getBoats().find(x=>x.id===id);
+  if(confirm(`Remove "${b?b.name:'this boat'}" from your fleet? It will disappear from the public site.`)){
+    CBR.removeBoat(id); renderAll(); toast("Boat removed");
+  }
+}
+
+/* ---------------- BOOT ---------------- */
+if(sessionStorage.getItem(AUTH_KEY)==="1") showApp();
+</script>
+</body>
+</html>
