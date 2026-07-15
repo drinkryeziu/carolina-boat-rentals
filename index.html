@@ -273,6 +273,17 @@ footer a:hover{color:#fff}
 .sum-line.tot{border-top:1.5px solid var(--line);margin-top:6px;padding-top:14px;font-size:17px;font-weight:800;color:var(--navy)}
 .sum-line .muted{color:var(--muted);font-size:12.5px}
 .deposit-note{background:#eaf3fb;border-radius:12px;padding:14px;font-size:13px;color:#25506f;margin-top:16px;display:flex;gap:10px}
+.pay-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}
+.pay-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.pay-due{font-size:13px;color:var(--muted);font-weight:600}
+.pay-due b{display:block;font-size:22px;color:var(--navy);letter-spacing:-.02em}
+.stripe-badge{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.stripe-badge b{color:#635bff;font-weight:800;letter-spacing:-.02em}
+.card-input{position:relative}
+.card-input input{padding-right:44px}
+.card-brands{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:16px}
+.pay-row{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px}
+.pay-note{font-size:11.5px;color:#8a6d3b;background:#fff8e8;border:1px solid #f3e2b8;border-radius:10px;padding:9px 11px;margin-top:12px;line-height:1.45}
 
 /* confirmation */
 .confirm{text-align:center;padding:20px 0}
@@ -644,12 +655,31 @@ footer a:hover{color:#fff}
       <!-- STEP 5: DEPOSIT + CONFIRM -->
       <div class="step-pane" data-pane="5">
         <div id="reviewPane">
-          <div class="pane-title">Review &amp; secure your spot</div>
-          <div class="pane-sub">We authorize a refundable hold today — the balance is due at the dock.</div>
+          <div class="pane-title">Pay your deposit &amp; confirm</div>
+          <div class="pane-sub">Pay 30% now to lock your boat — the balance is due at the dock.</div>
           <div class="confirm-card" id="summary"></div>
+
+          <div class="pay-box">
+            <div class="pay-head">
+              <span class="pay-due">Due now (30% deposit)<b id="payDue">$0</b></span>
+              <span class="stripe-badge">🔒 Secured by <b>stripe</b></span>
+            </div>
+            <div class="field" style="margin-bottom:10px">
+              <label>Card number</label>
+              <div class="card-input"><input id="cc-num" inputmode="numeric" placeholder="4242 4242 4242 4242" autocomplete="off" />
+                <span class="card-brands">💳</span></div>
+            </div>
+            <div class="pay-row">
+              <div class="field"><label>Expiry</label><input id="cc-exp" placeholder="MM / YY" autocomplete="off" /></div>
+              <div class="field"><label>CVC</label><input id="cc-cvc" inputmode="numeric" placeholder="123" autocomplete="off" /></div>
+              <div class="field"><label>ZIP</label><input id="cc-zip" inputmode="numeric" placeholder="28031" autocomplete="off" /></div>
+            </div>
+            <div class="pay-note">🧪 <b>Demo / test mode</b> — this is a prototype, not live payment. Don't enter a real card; use Stripe's test card 4242 4242 4242 4242. In production this is a Stripe Checkout charge.</div>
+          </div>
+
           <div class="deposit-note">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex:0 0 auto"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3Z" stroke="#25506f" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#25506f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Secure deposit hold.</b> We place a temporary authorization to reserve your boat — not a charge. It's released after your trip. Card entry is handled on our PCI-compliant, encrypted checkout.</span>
+            <span><b>Fully refundable.</b> Your 30% deposit is refunded in full if you cancel up to 48 hours before, or if we call your trip for weather. The remaining balance is collected at the dock.</span>
           </div>
         </div>
       </div>
@@ -837,9 +867,10 @@ function renderSummary(){
   ADDONS.forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
   rows+=`
     <div class="sum-line tot"><span>Trip total</span><span>${money(t.subtotal)}</span></div>
-    <div class="sum-line"><span class="muted">Refundable hold today (30%)</span><span class="muted">${money(t.deposit)}</span></div>
+    <div class="sum-line"><span class="muted">Deposit due now (30%, refundable)</span><span class="muted">${money(t.deposit)}</span></div>
     <div class="sum-line"><span class="muted">Balance due at dock</span><span class="muted">${money(t.subtotal-t.deposit)}</span></div>`;
   $("#summary").innerHTML=rows;
+  const pd=$("#payDue"); if(pd) pd.textContent=money(t.deposit);
 }
 
 /* ---------------- CONFIRMATION ---------------- */
@@ -868,7 +899,7 @@ function confirmBooking(){
         <div class="sum-line"><span>${t.b.name}</span><b>${money(t.subtotal)}</b></div>
         <div class="sum-line"><span class="muted">${state.dateLabel} · ${slot}</span></div>
         <div class="sum-line"><span class="muted">Launch: Blythe Landing, Huntersville</span></div>
-        <div class="sum-line tot"><span>Deposit held</span><span style="color:var(--ok)">${money(t.deposit)} ✓</span></div>
+        <div class="sum-line tot"><span>Deposit paid (30%)</span><span style="color:var(--ok)">${money(t.deposit)} ✓</span></div>
         <div class="sum-line"><span class="muted">Balance at dock</span><span class="muted">${money(t.subtotal-t.deposit)}</span></div>
       </div>
       <p style="font-size:12.5px;color:var(--muted);margin-top:14px">Need to change something? Reply to your confirmation text or call 704-614-2118.</p>
@@ -883,10 +914,10 @@ function showStep(){
   document.querySelectorAll(".steps-bar .sb").forEach(sb=>{
     const n=+sb.dataset.s; sb.classList.toggle("active",n===step); sb.classList.toggle("done",n<step);
   });
-  const titles={1:"Choose your boat",2:"Date & time",3:"Add extras",4:"Details & waiver",5:"Review & confirm"};
+  const titles={1:"Choose your boat",2:"Date & time",3:"Add extras",4:"Details & waiver",5:"Payment"};
   $("#modalTitle").textContent=titles[step];
   $("#backBtn").style.display = step>1?"inline-flex":"none";
-  $("#nextBtn").textContent = step===5?"Confirm & hold spot 🔒":"Continue →";
+  $("#nextBtn").textContent = step===5?`Pay ${money(calcTotal().deposit)} deposit 🔒`:"Continue →";
   if(step===5)renderSummary();
   updateTotal();
   $("#modalBody").scrollTop=0;
@@ -899,7 +930,13 @@ function nextStep(){
     if(!$("#agreeWaiver").checked){toast("Please agree to the waiver");return;}
     if(!state.uploaded){toast("Upload your boater card to continue");return;}
   }
-  if(step===5){confirmBooking();return;}
+  if(step===5){
+    const digits=($("#cc-num").value||"").replace(/\D/g,"");
+    if(digits.length<15 || !$("#cc-exp").value || !$("#cc-cvc").value){toast("Enter test card details to pay the deposit");return;}
+    const btn=$("#nextBtn"); btn.textContent="Processing…"; btn.disabled=true;
+    setTimeout(()=>{ btn.disabled=false; confirmBooking(); }, 700); // simulate Stripe charge
+    return;
+  }
   step++; showStep();
 }
 function prevStep(){if(step>1){step--;showStep();}}
@@ -907,6 +944,13 @@ $("#hb-boat")&&$("#hb-boat").addEventListener("change",e=>state.boat=e.target.va
 
 // init hero date default
 (function(){const d=$("#hb-date"); if(d){const t=new Date(2026,6,18);d.value=t.toISOString().slice(0,10);d.min="2026-07-14";}})();
+
+// demo card-input formatting (cosmetic only)
+document.addEventListener("input",e=>{
+  if(e.target.id==="cc-num"){e.target.value=e.target.value.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim();}
+  if(e.target.id==="cc-exp"){let v=e.target.value.replace(/\D/g,"").slice(0,4); e.target.value=v.length>2?v.slice(0,2)+" / "+v.slice(2):v;}
+  if(e.target.id==="cc-cvc"){e.target.value=e.target.value.replace(/\D/g,"").slice(0,4);}
+});
 
 // Load fleet from the owner dashboard store, and refresh if the owner edits it in another tab.
 loadFleet();
