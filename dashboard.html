@@ -134,6 +134,23 @@ tbody tr:hover{background:#fafcfe}
 /* ---------- EXPORT MODAL ---------- */
 .export-ta{width:100%;min-height:200px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fbfcfe;color:#33485e;resize:vertical;white-space:pre;overflow:auto}
 
+/* ---------- CANCEL / REFUND ---------- */
+.cancel-link{display:block;margin-top:6px;font-size:11.5px;font-weight:700;color:#b23b3b;background:none;padding:3px 0;cursor:pointer}
+.cancel-link:hover{text-decoration:underline}
+.cancel-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#b23b3b;background:#fdecea;padding:6px 11px;border-radius:999px;white-space:nowrap}
+.policy-banner{border-radius:10px;padding:12px 14px;font-size:13px;font-weight:600;margin:0 0 16px;display:flex;gap:8px;line-height:1.45}
+.policy-banner.ok{color:var(--ok);background:var(--ok-bg)}
+.policy-banner.no{color:#b7791f;background:#fdf3e0}
+.cancel-sum{font-size:13.5px;color:#33485e;line-height:1.8}
+.cancel-sum b{color:var(--navy)}
+.resched-box{border:1px dashed var(--line);border-radius:11px;padding:14px;margin-top:16px}
+.resched-box .rl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px}
+.resched-row{display:flex;gap:10px}
+.resched-row input{flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14px;background:#fbfcfe}
+.resched-row input:focus{outline:none;border-color:var(--blue)}
+.btn-danger{background:#c0392b;color:#fff}
+.btn-danger:hover{background:#a93226}
+
 /* ---------- INVOICE ---------- */
 .inv-sheet{background:#fff;border:1px solid var(--line);border-radius:12px;padding:26px}
 .inv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:18px}
@@ -463,10 +480,10 @@ function askConfirm(msg, okLabel, onYes){
 function renderAll(){ renderTiles(); renderRentals(); renderRevBars(); renderFleet(); }
 
 function renderTiles(){
-  const bk=CBR.getBookings();
+  const bk=CBR.getBookings().filter(b=>b.status!=="cancelled");   // cancelled trips aren't revenue
   const revenue=bk.reduce((s,b)=>s+ (b.subtotal||0),0);
   const deposits=bk.reduce((s,b)=>s+ (b.deposit||0),0);
-  const upcoming=bk.filter(b=>b.date>=TODAY && b.status!=="cancelled").length;
+  const upcoming=bk.filter(b=>b.date>=TODAY).length;
   const avg=bk.length?Math.round(revenue/bk.length):0;
   const tiles=[
     {lab:"Booked revenue",val:CBR.money(revenue),sub:`${bk.length} bookings this season`,ic:"💰",bg:"#e7f6ee"},
@@ -486,6 +503,10 @@ function balanceOf(b){ return (b.subtotal||0)-(b.deposit||0); }
 
 function balanceCell(b){
   const bal=balanceOf(b);
+  if(b.status==="cancelled"){
+    return `<span class="cancel-pill">✕ Cancelled</span>`+
+      (b.refunded ? `<div class="pay-split">Refunded ${CBR.money(b.refundAmount||0)}</div>` : `<div class="pay-split">No refund issued</div>`);
+  }
   if(b.balancePaid){
     const how = b.payMethod==="split" ? "card + cash" : (b.payMethod==="cash" ? "cash" : "card");
     const extra = b.payMethod==="split" ? `<div class="pay-split">${CBR.money(b.cardAmount||0)} card · ${CBR.money(b.cashAmount||0)} cash</div>` : "";
@@ -511,7 +532,7 @@ function renderRentals(){
   const term=(($("#rentalSearch")||{}).value||"").trim().toLowerCase();
   const dateVal=(($("#rentalDate")||{}).value||"");
   let rows=all.filter(b=>rentalMatches(b,term,dateVal));
-  if(rentalTab==="charge") rows=rows.filter(b=>!b.balancePaid);
+  if(rentalTab==="charge") rows=rows.filter(b=>!b.balancePaid && b.status!=="cancelled");
 
   $("#rentalRows").innerHTML=rows.map(b=>`
     <tr>
@@ -522,11 +543,11 @@ function renderRentals(){
       <td>${b.source==="walk-up"?'<span style="color:var(--muted)">—</span>':CBR.money(b.deposit||0)}</td>
       <td>${balanceCell(b)}</td>
       <td><span class="status ${b.status||'confirmed'}"><span class="d"></span>${(b.status||'confirmed').replace(/^\w/,c=>c.toUpperCase())}</span></td>
-      <td><button class="inv-btn" onclick="showInvoice('${b.code}')">🧾 Invoice</button></td>
+      <td><button class="inv-btn" onclick="showInvoice('${b.code}')">🧾 Invoice</button>${cancellable(b)?`<button class="cancel-link" onclick="showCancel('${b.code}')">Cancel / refund</button>`:''}</td>
     </tr>`).join("") || `<tr class="empty-row"><td colspan="8">${all.length?"No rentals match your filters.":"No bookings yet."}</td></tr>`;
 
-  // badges + summary (always from the full list)
-  const unpaid=all.filter(b=>!b.balancePaid);
+  // badges + summary (from active, non-cancelled bookings)
+  const unpaid=all.filter(b=>!b.balancePaid && b.status!=="cancelled");
   const due=unpaid.reduce((s,b)=>s+balanceOf(b),0);
   const cc=$("#chargeCount"); if(cc) cc.textContent=unpaid.length;
   const cf=$("#clearFilters"); if(cf) cf.style.display=(term||dateVal)?"inline-block":"none";
@@ -683,6 +704,66 @@ function emailInvoice(b, balance, methodLabel){
   try{ window.location.href=href; }catch(e){ toast("Email client unavailable in this preview"); }
 }
 
+/* ---------------- CANCEL / REFUND / RESCHEDULE ---------------- */
+function cancellable(b){ return b.status!=="cancelled" && b.status!=="completed" && (b.date||"")>=TODAY; }
+
+function showCancel(code){
+  const b=CBR.getBookings().find(x=>x.code===code); if(!b) return;
+  const info=CBR.refundInfo(b);
+  const banner = info.eligible
+    ? `<div class="policy-banner ok">✓ Eligible for a full deposit refund — ${info.reason} (${info.hours}h out).</div>`
+    : `<div class="policy-banner no">⚠ ${info.reason} (${info.hours}h out) — per policy the deposit is non-refundable. You can still refund as a courtesy.</div>`;
+  const ov=document.createElement("div"); ov.className="overlay open"; ov.style.zIndex="200";
+  ov.innerHTML=`<div class="modal" style="max-width:480px">
+    <div class="modal-head"><h3>Cancel ${b.code}</h3><button class="x" data-close>×</button></div>
+    <div class="modal-body">
+      ${banner}
+      <div class="cancel-sum">
+        <div><b>${b.name}</b> · ${b.phone||""}</div>
+        <div>${b.boatName} — ${b.slot||""}</div>
+        <div>${b.dateLabel||b.date}</div>
+        <div>Deposit on file: <b>${CBR.money(info.deposit)}</b></div>
+      </div>
+      <div class="resched-box">
+        <div class="rl">Prefer to keep the booking?</div>
+        <div class="resched-row">
+          <input type="date" id="cx-date" min="${TODAY}" value="${b.date}" />
+          <button class="btn btn-line" data-resched>Reschedule</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-line" data-close>Keep booking</button>
+      ${info.eligible
+        ? `<button class="btn btn-danger" data-refund>Cancel &amp; refund ${CBR.money(info.deposit)}</button>`
+        : `<button class="btn btn-line" data-refund>Refund anyway</button><button class="btn btn-danger" data-norefund>Cancel — no refund</button>`}
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
+  ov.querySelectorAll("[data-close]").forEach(el=>el.onclick=close);
+  const rb=ov.querySelector("[data-refund]"); if(rb) rb.onclick=()=>{ close(); doCancel(code, true); };
+  const nb=ov.querySelector("[data-norefund]"); if(nb) nb.onclick=()=>{ close(); doCancel(code, false); };
+  ov.querySelector("[data-resched]").onclick=()=>{
+    const nd=ov.querySelector("#cx-date").value; if(!nd){ toast("Pick a new date"); return; }
+    const label=new Date(nd+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+    CBR.rescheduleBooking(code, nd, label); close(); renderAll(); toast(`Moved to ${label} — deposit kept`);
+  };
+}
+function doCancel(code, refund){
+  const b=CBR.getBookings().find(x=>x.code===code); const info=CBR.refundInfo(b);
+  if(refund){
+    toast("Refunding deposit via Stripe…");
+    setTimeout(()=>{                       // simulate Stripe Refunds API on the deposit PaymentIntent
+      CBR.cancelBooking(code, true); renderAll();
+      toast(`Cancelled — ${CBR.money(info.deposit)} refunded to ${b.name.split(" ")[0]}`);
+    }, 800);
+  } else {
+    CBR.cancelBooking(code, false); renderAll(); toast("Booking cancelled (no refund)");
+  }
+}
+
 /* balance actions (owner-initiated at check-in) */
 function chargeBalance(code, ev){
   const b=CBR.getBookings().find(x=>x.code===code); if(!b||b.cashOnly) return;
@@ -771,7 +852,7 @@ function saveWalkup(){
 }
 
 function renderRevBars(){
-  const bk=CBR.getBookings(), byBoat={};
+  const bk=CBR.getBookings().filter(b=>b.status!=="cancelled"), byBoat={};
   bk.forEach(b=>{ byBoat[b.boatName]=(byBoat[b.boatName]||0)+(b.subtotal||0); });
   const rows=Object.entries(byBoat).sort((a,b)=>b[1]-a[1]);
   const max=Math.max(1,...rows.map(r=>r[1]));
