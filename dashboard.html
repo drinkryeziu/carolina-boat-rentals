@@ -205,6 +205,8 @@ tbody tr:hover{background:#fafcfe}
 .mini{font-size:12px;font-weight:700;padding:7px 10px;border-radius:8px;border:1.5px solid var(--line);color:var(--navy);white-space:nowrap}
 .mini:hover{border-color:var(--blue);color:var(--blue)}
 .mini.danger:hover{border-color:#c0392b;color:#c0392b}
+.mini.book{background:#eaf3fb;border-color:#cfe2f4;color:var(--blue)}
+.mini.book:hover{background:#dcecfa;border-color:var(--blue)}
 .chip{display:inline-flex;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-top:6px}
 .chip.available{color:var(--ok);background:var(--ok-bg)}
 .chip.limited{color:var(--warn);background:var(--warn-bg)}
@@ -872,10 +874,22 @@ function renderFleet(){
         <span class="chip ${b.status}">${b.status==='soldout'?'Fully booked':(b.status==='limited'?'Limited':'Available')}</span>
       </div>
       <div class="acts">
+        <button class="mini book" onclick="toggleBooked('${b.id}')">${b.status==='soldout'?'✓ Mark available':'Mark booked'}</button>
         <button class="mini" onclick="openBoat('${b.id}')">Edit</button>
         <button class="mini danger" onclick="removeBoat('${b.id}')">Remove</button>
       </div>
     </div>`).join("");
+}
+function toggleBooked(id){
+  const b=CBR.getBoats().find(x=>x.id===id); if(!b) return;
+  if(b.status==="soldout"){
+    CBR.updateBoat(Object.assign({}, b, {status:"available", statusText:"Available"}));
+    toast(`${b.name} marked available`);
+  } else {
+    CBR.updateBoat(Object.assign({}, b, {status:"soldout", statusText:"Fully booked"}));
+    toast(`${b.name} marked fully booked`);
+  }
+  renderAll();   // updates the fleet here + the public booking site (shared store)
 }
 
 /* ---------------- BOAT EDITOR ---------------- */
