@@ -369,7 +369,22 @@ function doLogin(e){
 }
 function logout(){ sessionStorage.removeItem(AUTH_KEY); $("#appView").classList.add("hidden"); $("#loginView").classList.remove("hidden"); $("#p").value=""; }
 function showApp(){ $("#loginView").classList.add("hidden"); $("#appView").classList.remove("hidden"); renderAll(); }
-function resetDemo(){ if(confirm("Reset all demo boats and bookings to defaults?")){ CBR.resetAll(); renderAll(); toast("Demo data reset"); } }
+function resetDemo(){ askConfirm("Reset all demo boats and bookings back to the defaults?", "Reset demo", ()=>{ CBR.resetAll(); renderAll(); toast("Demo data reset"); }); }
+
+/* in-page confirm (native confirm() is blocked in sandboxed iframes) */
+function askConfirm(msg, okLabel, onYes){
+  const ov=document.createElement("div"); ov.className="overlay open"; ov.style.zIndex="200";
+  ov.innerHTML=`<div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>Please confirm</h3></div>
+    <div class="modal-body"><p style="font-size:14.5px;color:var(--ink);line-height:1.5">${msg}</p></div>
+    <div class="modal-foot"><button class="btn btn-line" data-no>Cancel</button><button class="btn btn-navy" data-yes>${okLabel||"Confirm"}</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
+  ov.querySelector("[data-no]").onclick=close;
+  ov.querySelector("[data-yes]").onclick=()=>{ close(); onYes(); };
+}
 
 /* ---------------- RENDER ---------------- */
 function renderAll(){ renderTiles(); renderRentals(); renderRevBars(); renderFleet(); }
@@ -603,9 +618,9 @@ function saveBoat(){
 }
 function removeBoat(id){
   const b=CBR.getBoats().find(x=>x.id===id);
-  if(confirm(`Remove "${b?b.name:'this boat'}" from your fleet? It will disappear from the public site.`)){
+  askConfirm(`Remove "${b?b.name:'this boat'}" from your fleet? It will disappear from the public site.`, "Remove boat", ()=>{
     CBR.removeBoat(id); renderAll(); toast("Boat removed");
-  }
+  });
 }
 
 /* ---------------- BOOT ---------------- */
