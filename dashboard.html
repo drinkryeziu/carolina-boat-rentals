@@ -108,6 +108,58 @@ tbody tr:hover{background:#fafcfe}
 .cash-paid:hover{background:#d9f2e3}
 .paid-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-bg);padding:6px 11px;border-radius:999px;white-space:nowrap}
 .pay-split{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ---------- RENTALS TOOLBAR ---------- */
+.rentals-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tabs{display:inline-flex;background:#eef2f6;border-radius:10px;padding:3px}
+.tab{font-size:13px;font-weight:700;color:var(--muted);padding:7px 14px;border-radius:8px;display:inline-flex;align-items:center;gap:7px}
+.tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(11,41,66,.12)}
+.tab-badge{font-size:11px;font-weight:800;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#635bff;color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.tab:not(.active) .tab-badge{background:#c3ccd8}
+.rtool{font-size:13.5px;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fbfcfe;color:var(--ink);font-family:inherit}
+.rtool:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(18,102,184,.12);background:#fff}
+.rtool.search{flex:1;min-width:170px}
+.rtool.linkish{border:none;background:none;color:var(--blue);font-weight:700;padding:9px 6px;cursor:pointer}
+.export-wrap{position:relative}
+.export-btn{cursor:pointer;font-weight:700;white-space:nowrap}
+.export-btn:hover{border-color:var(--blue);color:var(--blue)}
+.export-menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:6px;min-width:150px;z-index:30;display:none}
+.export-menu.open{display:block}
+.export-menu button{display:block;width:100%;text-align:left;font-size:13.5px;font-weight:600;color:var(--ink);padding:9px 12px;border-radius:8px}
+.export-menu button:hover{background:#f1f5f9;color:var(--blue)}
+.inv-btn{font-size:12px;font-weight:700;padding:7px 11px;border-radius:8px;border:1.5px solid var(--line);color:var(--navy);background:#fff;white-space:nowrap}
+.inv-btn:hover{border-color:var(--blue);color:var(--blue)}
+.empty-row td{text-align:center;color:var(--muted);padding:28px}
+
+/* ---------- EXPORT MODAL ---------- */
+.export-ta{width:100%;min-height:200px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:10px;padding:12px;background:#fbfcfe;color:#33485e;resize:vertical;white-space:pre;overflow:auto}
+
+/* ---------- INVOICE ---------- */
+.inv-sheet{background:#fff;border:1px solid var(--line);border-radius:12px;padding:26px}
+.inv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:18px}
+.inv-brand{font-size:18px;font-weight:800;color:var(--navy)}
+.inv-brand small{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.inv-meta{text-align:right;font-size:12.5px;color:var(--muted)}
+.inv-meta b{color:var(--navy);font-size:15px;display:block}
+.inv-parties{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.inv-parties h5{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 5px}
+.inv-parties div{font-size:13.5px;color:var(--ink);line-height:1.5}
+.inv-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.inv-table th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+.inv-table td{font-size:13.5px;padding:10px;border-bottom:1px solid #eef2f6}
+.inv-table td.r,.inv-table th.r{text-align:right}
+.inv-tot{margin-left:auto;width:260px;max-width:100%}
+.inv-tot .l{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;color:#33485e}
+.inv-tot .l.grand{border-top:1.5px solid var(--navy);margin-top:6px;padding-top:10px;font-size:16px;font-weight:800;color:var(--navy)}
+.inv-tot .l.paid{color:var(--ok);font-weight:700}
+.inv-note{font-size:12px;color:var(--muted);margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+@media print{
+  body>*{display:none!important}
+  #invoiceOverlay{display:block!important;position:static;background:none;padding:0;inset:auto}
+  #invoiceOverlay .modal{box-shadow:none;max-width:none;border-radius:0}
+  #invoiceOverlay .modal-head,#invoiceOverlay .modal-foot{display:none!important}
+  #invoiceOverlay .inv-sheet{border:none;padding:0}
+}
 .wu-chip{display:inline-block;font-size:10.5px;font-weight:700;color:#6b4e12;background:#fdf0d5;padding:2px 7px;border-radius:6px;margin-top:4px}
 
 /* ---------- WALK-UP BOOKING ---------- */
@@ -238,13 +290,33 @@ tbody tr:hover{background:#fafcfe}
 
     <!-- Recent rentals -->
     <div class="panel">
-      <div class="panel-head">
-        <div><h2>Recent rentals</h2><p>Everyone who's booked — collect the 70% balance at check-in.</p></div>
-        <div class="collect-fig" id="collectFig"></div>
+      <div class="panel-head" style="flex-direction:column;align-items:stretch;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+          <div><h2>Recent rentals</h2><p>Search, filter, invoice, and collect the 70% balance at check-in.</p></div>
+          <div class="collect-fig" id="collectFig"></div>
+        </div>
+        <div class="rentals-toolbar">
+          <div class="tabs">
+            <button class="tab active" data-tab="all" onclick="setTab('all')">All</button>
+            <button class="tab" data-tab="charge" onclick="setTab('charge')">To charge <span class="tab-badge" id="chargeCount">0</span></button>
+          </div>
+          <input class="rtool search" id="rentalSearch" placeholder="🔍 Search name, boat, phone…" oninput="renderRentals()" />
+          <input class="rtool" id="rentalDate" type="date" title="Filter by trip date" onchange="renderRentals()" />
+          <button class="rtool linkish" id="clearFilters" onclick="clearFilters()" style="display:none">Clear</button>
+          <div class="export-wrap">
+            <button class="rtool export-btn" onclick="toggleExport(event)">⭳ Export ▾</button>
+            <div class="export-menu" id="exportMenu">
+              <button onclick="exportRentals('day')">Today</button>
+              <button onclick="exportRentals('week')">This week</button>
+              <button onclick="exportRentals('month')">This month</button>
+              <button onclick="exportRentals('all')">All time</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Guest</th><th>Boat</th><th>Trip date</th><th>Total</th><th>Deposit</th><th>Balance (70%)</th><th>Status</th></tr></thead>
+          <thead><tr><th>Guest</th><th>Boat</th><th>Trip date</th><th>Total</th><th>Deposit</th><th>Balance (70%)</th><th>Status</th><th></th></tr></thead>
           <tbody id="rentalRows"></tbody>
         </table>
       </div>
@@ -356,6 +428,7 @@ const AUTH_KEY="cbr_auth";
 const CREDS={user:"owner",pass:"lakenorman"};
 const TODAY="2026-07-14";
 let editingImage=null, editingId=null;
+let rentalTab="all";
 
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400);}
 
@@ -427,9 +500,20 @@ function balanceCell(b){
     </div>`;
 }
 
+function rentalMatches(b, term, dateVal){
+  if(dateVal && b.date!==dateVal) return false;
+  if(!term) return true;
+  const hay=`${b.name} ${b.phone||''} ${b.email||''} ${b.boatName} ${b.dateLabel||''} ${b.date||''} ${b.code}`.toLowerCase();
+  return hay.includes(term);
+}
 function renderRentals(){
-  const bk=CBR.getBookings();
-  $("#rentalRows").innerHTML=bk.map(b=>`
+  const all=CBR.getBookings();
+  const term=(($("#rentalSearch")||{}).value||"").trim().toLowerCase();
+  const dateVal=(($("#rentalDate")||{}).value||"");
+  let rows=all.filter(b=>rentalMatches(b,term,dateVal));
+  if(rentalTab==="charge") rows=rows.filter(b=>!b.balancePaid);
+
+  $("#rentalRows").innerHTML=rows.map(b=>`
     <tr>
       <td class="guest"><b>${b.name}</b><span>${b.phone||b.email||""}</span>${b.source==="walk-up"?'<span class="wu-chip">🎫 Walk-up</span>':''}</td>
       <td>${b.boatName}</td>
@@ -438,13 +522,165 @@ function renderRentals(){
       <td>${b.source==="walk-up"?'<span style="color:var(--muted)">—</span>':CBR.money(b.deposit||0)}</td>
       <td>${balanceCell(b)}</td>
       <td><span class="status ${b.status||'confirmed'}"><span class="d"></span>${(b.status||'confirmed').replace(/^\w/,c=>c.toUpperCase())}</span></td>
-    </tr>`).join("") || `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No bookings yet.</td></tr>`;
-  // outstanding balance summary
-  const unpaid=bk.filter(b=>!b.balancePaid);
+      <td><button class="inv-btn" onclick="showInvoice('${b.code}')">🧾 Invoice</button></td>
+    </tr>`).join("") || `<tr class="empty-row"><td colspan="8">${all.length?"No rentals match your filters.":"No bookings yet."}</td></tr>`;
+
+  // badges + summary (always from the full list)
+  const unpaid=all.filter(b=>!b.balancePaid);
   const due=unpaid.reduce((s,b)=>s+balanceOf(b),0);
+  const cc=$("#chargeCount"); if(cc) cc.textContent=unpaid.length;
+  const cf=$("#clearFilters"); if(cf) cf.style.display=(term||dateVal)?"inline-block":"none";
   $("#collectFig").innerHTML = unpaid.length
     ? `To collect at dock<b>${CBR.money(due)}</b>${unpaid.length} trip${unpaid.length>1?'s':''}`
     : `<b style="color:var(--ok)">All balances collected ✓</b>`;
+}
+function setTab(t){
+  rentalTab=t;
+  document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active", el.dataset.tab===t));
+  renderRentals();
+}
+function clearFilters(){ $("#rentalSearch").value=""; $("#rentalDate").value=""; renderRentals(); }
+
+/* ---------------- EXPORT (CSV by period) ---------------- */
+function toggleExport(ev){ ev.stopPropagation(); $("#exportMenu").classList.toggle("open"); }
+function closeExport(){ const m=$("#exportMenu"); if(m) m.classList.remove("open"); }
+document.addEventListener("click",()=>closeExport());
+
+function weekRange(iso){                 // Mon–Sun week containing the given date
+  const d=new Date(iso+"T12:00:00"); const day=(d.getDay()+6)%7; // 0=Mon
+  const mon=new Date(d); mon.setDate(d.getDate()-day);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  const f=x=>x.toISOString().slice(0,10);
+  return [f(mon), f(sun)];
+}
+function filterByPeriod(list, period){
+  if(period==="all") return list;
+  if(period==="day")   return list.filter(b=>b.date===TODAY);
+  if(period==="month") return list.filter(b=>(b.date||"").slice(0,7)===TODAY.slice(0,7));
+  if(period==="week"){ const [a,z]=weekRange(TODAY); return list.filter(b=>b.date>=a && b.date<=z); }
+  return list;
+}
+function toCSV(rows){
+  const head=["Code","Guest","Phone","Email","Boat","Trip date","Duration","Total","Deposit","Balance due","Paid","Method","Card","Cash","Source","Status"];
+  const esc=v=>{ v=(v==null?"":String(v)); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const lines=rows.map(b=>[b.code,b.name,b.phone,b.email,b.boatName,b.dateLabel||b.date,b.slot,
+    b.subtotal||0, b.source==="walk-up"?0:(b.deposit||0), b.balancePaid?0:balanceOf(b),
+    b.balancePaid?"yes":"no", b.payMethod||"", b.cardAmount||0, b.cashAmount||0, b.source||"online", b.status||""
+  ].map(esc).join(","));
+  return [head.join(","), ...lines].join("\n");
+}
+function exportRentals(period){
+  closeExport();
+  const rows=filterByPeriod(CBR.getBookings(), period);
+  const labels={day:"Today",week:"This week",month:"This month",all:"All time"};
+  if(!rows.length){ toast(`No rentals for ${labels[period].toLowerCase()}`); return; }
+  showExportModal(toCSV(rows), period, labels[period], rows.length);
+}
+function showExportModal(csv, period, label, n){
+  const ov=document.createElement("div"); ov.className="overlay open"; ov.style.zIndex="200";
+  ov.innerHTML=`<div class="modal" style="max-width:640px">
+    <div class="modal-head"><h3>Export · ${label} · ${n} rental${n>1?'s':''}</h3><button class="x" data-close>×</button></div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:12px">Download the CSV (opens in Excel or Google Sheets), or copy it below.</p>
+      <textarea class="export-ta" readonly>${csv.replace(/</g,"&lt;")}</textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-line" data-copy>Copy</button>
+      <button class="btn btn-sun" data-dl>⭳ Download CSV</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
+  ov.querySelector("[data-close]").onclick=close;
+  ov.querySelector("[data-dl]").onclick=()=>{ downloadCSV(csv, `carolina-rentals-${period}.csv`); };
+  ov.querySelector("[data-copy]").onclick=()=>{ copyText(csv, ov.querySelector(".export-ta")); };
+}
+function downloadCSV(csv, name){
+  try{
+    const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ a.remove(); URL.revokeObjectURL(url); }, 100);
+    toast("CSV downloaded");
+  }catch(e){ toast("Download blocked here — copy the text instead"); }
+}
+function copyText(text, ta){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Copied to clipboard")).catch(()=>fallbackCopy(ta));
+  } else fallbackCopy(ta);
+}
+function fallbackCopy(ta){ if(ta){ ta.focus(); ta.select(); try{document.execCommand("copy"); toast("Copied");}catch(e){toast("Select the text and copy");} } }
+
+/* ---------------- INVOICE ---------------- */
+function showInvoice(code){
+  const b=CBR.getBookings().find(x=>x.code===code); if(!b) return;
+  const walkup=b.source==="walk-up";
+  const deposit=walkup?0:(b.deposit||0);
+  const balance=b.balancePaid?0:balanceOf(b);
+  const paid=(b.subtotal||0)-balance;
+  let methodLabel;
+  if(b.payMethod==="split") methodLabel=`Split — ${CBR.money(b.cardAmount||0)} card + ${CBR.money(b.cashAmount||0)} cash`;
+  else if(b.payMethod) methodLabel=b.payMethod.charAt(0).toUpperCase()+b.payMethod.slice(1);
+  else if(!walkup && deposit>0) methodLabel="Card (deposit paid online)";
+  else methodLabel="—";
+  const ov=document.createElement("div"); ov.className="overlay open"; ov.id="invoiceOverlay"; ov.style.zIndex="200";
+  ov.innerHTML=`<div class="modal" style="max-width:620px">
+    <div class="modal-head"><h3>Invoice ${b.code}</h3><button class="x" data-close>×</button></div>
+    <div class="modal-body">
+      <div class="inv-sheet">
+        <div class="inv-top">
+          <div class="inv-brand">Carolina Boat Rentals<small>Lake Norman · Cornelius, NC · (704) 614-2118</small></div>
+          <div class="inv-meta"><b>INVOICE</b>${b.code}<br>${b.dateLabel||b.date}</div>
+        </div>
+        <div class="inv-parties">
+          <div><h5>Billed to</h5><div><b>${b.name}</b><br>${b.phone||""}<br>${b.email||""}</div></div>
+          <div style="text-align:right"><h5>Trip</h5><div>${b.boatName}<br>${b.slot||""}<br>${b.dateLabel||b.date}${walkup?'<br><b>Walk-up booking</b>':''}</div></div>
+        </div>
+        <table class="inv-table">
+          <thead><tr><th>Description</th><th class="r">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>${b.boatName} — ${b.slot||"rental"}</td><td class="r">${CBR.money(b.subtotal||0)}</td></tr>
+          </tbody>
+        </table>
+        <div class="inv-tot">
+          <div class="l"><span>Trip total</span><span>${CBR.money(b.subtotal||0)}</span></div>
+          ${walkup?"":`<div class="l"><span>Deposit paid (30%)</span><span>− ${CBR.money(deposit)}</span></div>`}
+          <div class="l paid"><span>Paid to date</span><span>${CBR.money(paid)}</span></div>
+          <div class="l grand"><span>${balance>0?"Balance due":"Balance"}</span><span>${CBR.money(balance)}</span></div>
+        </div>
+        <div class="inv-note">Payment method: ${methodLabel}. ${balance>0?"Balance is collected at the dock on check-in.":"Paid in full — thank you!"}</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-line" data-close>Close</button>
+      <button class="btn btn-line" data-print>🖨 Print / Save PDF</button>
+      <button class="btn btn-sun" data-email>✉ Email to guest</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
+  ov.querySelectorAll("[data-close]").forEach(el=>el.onclick=close);
+  ov.querySelector("[data-print]").onclick=()=>{ try{window.print();}catch(e){toast("Printing is blocked in this preview");} };
+  ov.querySelector("[data-email]").onclick=()=>emailInvoice(b, balance, methodLabel);
+}
+function emailInvoice(b, balance, methodLabel){
+  const subject=`Carolina Boat Rentals — Invoice ${b.code}`;
+  const body=[
+    `Hi ${b.name.split(" ")[0]},`,"",
+    `Here is your invoice from Carolina Boat Rentals.`,"",
+    `Invoice: ${b.code}`,
+    `Boat: ${b.boatName} (${b.slot||"rental"})`,
+    `Trip date: ${b.dateLabel||b.date}`,
+    `Trip total: ${CBR.money(b.subtotal||0)}`,
+    (b.source==="walk-up"?"":`Deposit paid: ${CBR.money(b.deposit||0)}`),
+    `Balance ${balance>0?"due at dock":"paid"}: ${CBR.money(balance)}`,
+    `Payment method: ${methodLabel}`,"",
+    `Questions? Call us at (704) 614-2118.`,"","See you on Lake Norman!"
+  ].filter(x=>x!==null).join("\n");
+  const href=`mailto:${encodeURIComponent(b.email||"")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  try{ window.location.href=href; }catch(e){ toast("Email client unavailable in this preview"); }
 }
 
 /* balance actions (owner-initiated at check-in) */
