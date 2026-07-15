@@ -726,10 +726,7 @@ function showCancel(code){
       </div>
       <div class="resched-box">
         <div class="rl">Prefer to keep the booking?</div>
-        <div class="resched-row">
-          <input type="date" id="cx-date" min="${TODAY}" value="${b.date}" />
-          <button class="btn btn-line" data-resched>Reschedule</button>
-        </div>
+        <button class="btn btn-line" data-resched style="width:100%">🗓 Reschedule — pick a new boat, date &amp; time</button>
       </div>
     </div>
     <div class="modal-foot">
@@ -746,9 +743,8 @@ function showCancel(code){
   const rb=ov.querySelector("[data-refund]"); if(rb) rb.onclick=()=>{ close(); doCancel(code, true); };
   const nb=ov.querySelector("[data-norefund]"); if(nb) nb.onclick=()=>{ close(); doCancel(code, false); };
   ov.querySelector("[data-resched]").onclick=()=>{
-    const nd=ov.querySelector("#cx-date").value; if(!nd){ toast("Pick a new date"); return; }
-    const label=new Date(nd+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
-    CBR.rescheduleBooking(code, nd, label); close(); renderAll(); toast(`Moved to ${label} — deposit kept`);
+    close();
+    document.body.appendChild(CBR.reschedulePicker(code, { onConfirm:(r)=>{ renderAll(); toast(`Rescheduled to ${r.dateLabel} on the ${r.boatName} — deposit kept`); } }));
   };
 }
 function doCancel(code, refund){

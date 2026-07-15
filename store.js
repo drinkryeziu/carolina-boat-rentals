@@ -109,6 +109,138 @@
     },
     rescheduleBooking(code, date, dateLabel){ return this.updateBooking(code, { date, dateLabel }); },
 
+    /* ---- availability (shared demo model) ---- */
+    TIME_SLOTS: [
+      {id:"am",    label:"Morning · 9:00–1:00"},
+      {id:"pm",    label:"Afternoon · 2:00–6:00"},
+      {id:"full",  label:"Full day · 9:00–6:00"},
+      {id:"sunset",label:"Sunset · 5:00–7:30"}
+    ],
+    dayStatus(iso){                          // 'past' | 'booked' | 'limited' | 'open'
+      if(iso < this.NOW.slice(0,10)) return "past";
+      const d=parseInt(iso.slice(-2),10);
+      if(d%13===0) return "booked";
+      if([5,6,12,19,20,26].indexOf(d)>-1) return "limited";
+      return "open";
+    },
+
+    /* ---- reusable reschedule picker (calendar + boats + slots) ---- */
+    _reschedCSS(){
+      if(document.getElementById("cbrx-css")) return;
+      const s=document.createElement("style"); s.id="cbrx-css";
+      s.textContent=`
+      .cbrx-ov{position:fixed;inset:0;background:rgba(8,22,36,.6);backdrop-filter:blur(4px);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:26px 14px;overflow-y:auto;font-family:inherit}
+      .cbrx-m{background:#fff;width:100%;max-width:660px;border-radius:18px;box-shadow:0 24px 60px rgba(11,41,66,.3);overflow:hidden;color:#0c1b28;animation:cbrx-pop .22s ease}
+      @keyframes cbrx-pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+      .cbrx-h{padding:17px 22px;border-bottom:1px solid #e4e9ef;display:flex;justify-content:space-between;align-items:center}
+      .cbrx-h h3{margin:0;font-size:18px;color:#0b2942;font-weight:800}
+      .cbrx-x{width:36px;height:36px;border:none;background:#f1f4f8;border-radius:10px;font-size:19px;color:#5d7186;cursor:pointer}
+      .cbrx-b{padding:20px 22px;max-height:66vh;overflow-y:auto}
+      .cbrx-lab{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5d7186;margin:0 0 8px}
+      .cbrx-boats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+      .cbrx-boat{border:1.5px solid #e4e9ef;border-radius:11px;padding:9px 13px;cursor:pointer;font-size:13.5px;font-weight:700;color:#0b2942;background:#fff;text-align:left;line-height:1.25}
+      .cbrx-boat.sel{border-color:#1266b8;background:#f3f9ff;box-shadow:0 0 0 3px rgba(18,102,184,.12)}
+      .cbrx-boat small{display:block;font-weight:600;color:#5d7186;font-size:11px}
+      .cbrx-cols{display:grid;gap:16px}
+      @media(min-width:600px){.cbrx-cols{grid-template-columns:1fr 1fr;align-items:start}}
+      .cbrx-cal{border:1px solid #e4e9ef;border-radius:13px;padding:14px}
+      .cbrx-cal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+      .cbrx-cal-h b{font-size:14px;color:#0b2942}
+      .cbrx-nav{width:32px;height:32px;border:none;background:#f1f4f8;border-radius:8px;font-size:15px;color:#0b2942;cursor:pointer}
+      .cbrx-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+      .cbrx-dow{text-align:center;font-size:10px;font-weight:700;color:#5d7186;text-transform:uppercase;padding:2px 0}
+      .cbrx-day{aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;background:#f7f9fb;color:#0c1b28;cursor:pointer;border:1.5px solid transparent;position:relative}
+      .cbrx-day:hover:not(.dis){border-color:#2e9fe0}
+      .cbrx-day.dis{color:#c4ced8;background:#fafbfc;cursor:not-allowed}
+      .cbrx-day.sel{background:#1266b8;color:#fff}
+      .cbrx-day.lim::after{content:"";position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:#f59300}
+      .cbrx-day.sel.lim::after{background:#fff}
+      .cbrx-legend{font-size:11px;color:#5d7186;margin-top:10px;display:flex;gap:14px}
+      .cbrx-legend i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#f59300;margin-right:4px;font-style:normal}
+      .cbrx-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      @media(min-width:600px){.cbrx-slots{grid-template-columns:1fr}}
+      .cbrx-slot{border:1.5px solid #e4e9ef;border-radius:10px;padding:11px 12px;text-align:left;background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:#0b2942}
+      .cbrx-slot.sel{border-color:#1266b8;background:#f3f9ff}
+      .cbrx-slots-empty{font-size:12.5px;color:#5d7186;padding:6px 2px}
+      .cbrx-f{padding:15px 22px;border-top:1px solid #e4e9ef;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+      .cbrx-sum{font-size:12.5px;color:#5d7186;font-weight:600}
+      .cbrx-btn{font-size:14px;font-weight:700;padding:11px 18px;border-radius:10px;border:none;cursor:pointer}
+      .cbrx-btn.line{background:#fff;border:1.5px solid #e4e9ef;color:#0b2942}
+      .cbrx-btn.go{background:linear-gradient(180deg,#ffb020,#f59300);color:#3a2500}
+      .cbrx-btn:disabled{opacity:.5;cursor:not-allowed}`;
+      document.head.appendChild(s);
+    },
+    reschedulePicker(code, opts){
+      opts=opts||{}; this._reschedCSS();
+      const self=this, bk=this.getBooking(code)||{};
+      const boats=this.getBoats().filter(b=>b.status!=="soldout");
+      let selBoat = (bk.boatId && boats.some(b=>b.id===bk.boatId)) ? bk.boatId : (boats[0]&&boats[0].id);
+      let selDate=null, selSlot=null, month=new Date(this.NOW.slice(0,7)+"-01T12:00:00");
+      const ov=document.createElement("div"); ov.className="cbrx-ov";
+      ov.innerHTML=`<div class="cbrx-m">
+        <div class="cbrx-h"><h3>Reschedule ${code}</h3><button class="cbrx-x" data-x>×</button></div>
+        <div class="cbrx-b">
+          <p class="cbrx-lab">Boat</p><div class="cbrx-boats" data-boats></div>
+          <div class="cbrx-cols">
+            <div>
+              <p class="cbrx-lab">New date</p>
+              <div class="cbrx-cal">
+                <div class="cbrx-cal-h"><button class="cbrx-nav" data-prev>‹</button><b data-ml></b><button class="cbrx-nav" data-next>›</button></div>
+                <div class="cbrx-grid" data-grid></div>
+                <div class="cbrx-legend"><span><i></i>Limited</span><span>Grey = unavailable</span></div>
+              </div>
+            </div>
+            <div><p class="cbrx-lab">Time slot</p><div class="cbrx-slots" data-slots></div></div>
+          </div>
+        </div>
+        <div class="cbrx-f"><span class="cbrx-sum" data-sum>Select a date &amp; time</span>
+          <div style="display:flex;gap:10px"><button class="cbrx-btn line" data-x>Cancel</button><button class="cbrx-btn go" data-go disabled>Confirm reschedule</button></div>
+        </div></div>`;
+      function boatsR(){
+        ov.querySelector("[data-boats]").innerHTML=boats.map(b=>`<button class="cbrx-boat ${b.id===selBoat?'sel':''}" data-boat="${b.id}">${b.name}<small>${self.money(b.half)}–${self.money(b.full)}</small></button>`).join("");
+        ov.querySelectorAll("[data-boat]").forEach(el=>el.onclick=()=>{selBoat=el.dataset.boat;boatsR();go();});
+      }
+      function calR(){
+        const y=month.getFullYear(), m=month.getMonth();
+        ov.querySelector("[data-ml]").textContent=month.toLocaleString("en-US",{month:"long",year:"numeric"});
+        const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+        let h=["Su","Mo","Tu","We","Th","Fr","Sa"].map(d=>`<div class="cbrx-dow">${d}</div>`).join("");
+        for(let i=0;i<first;i++) h+="<div></div>";
+        for(let d=1;d<=days;d++){
+          const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`, st=self.dayStatus(iso);
+          const dis=st==="past"||st==="booked", sel=selDate===iso;
+          h+=`<div class="cbrx-day ${dis?'dis':''} ${st==='limited'?'lim':''} ${sel?'sel':''}" ${dis?'':`data-day="${iso}"`}>${d}</div>`;
+        }
+        ov.querySelector("[data-grid]").innerHTML=h;
+        ov.querySelectorAll("[data-day]").forEach(el=>el.onclick=()=>{selDate=el.dataset.day;selSlot=null;calR();slotsR();go();});
+      }
+      function slotsR(){
+        const box=ov.querySelector("[data-slots]");
+        box.innerHTML = selDate ? self.TIME_SLOTS.map(s=>`<button class="cbrx-slot ${selSlot===s.id?'sel':''}" data-slot="${s.id}">${s.label}</button>`).join("")
+                                : `<div class="cbrx-slots-empty">← pick a date first</div>`;
+        box.querySelectorAll("[data-slot]").forEach(el=>el.onclick=()=>{selSlot=el.dataset.slot;slotsR();go();});
+      }
+      function go(){
+        const ok=selBoat&&selDate&&selSlot; ov.querySelector("[data-go]").disabled=!ok;
+        ov.querySelector("[data-sum]").textContent = ok
+          ? `${boats.find(b=>b.id===selBoat).name} · ${new Date(selDate+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})} · ${self.TIME_SLOTS.find(s=>s.id===selSlot).label.split(" · ")[0]}`
+          : "Select a date & time";
+      }
+      const close=()=>ov.remove();
+      ov.addEventListener("click",e=>{if(e.target===ov)close();});
+      ov.querySelectorAll("[data-x]").forEach(el=>el.onclick=close);
+      ov.querySelector("[data-prev]").onclick=()=>{month=new Date(month.getFullYear(),month.getMonth()-1,1);calR();};
+      ov.querySelector("[data-next]").onclick=()=>{month=new Date(month.getFullYear(),month.getMonth()+1,1);calR();};
+      ov.querySelector("[data-go]").onclick=()=>{
+        const label=new Date(selDate+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+        const slot=self.TIME_SLOTS.find(s=>s.id===selSlot), boat=boats.find(b=>b.id===selBoat);
+        self.updateBooking(code,{boatId:boat.id,boatName:boat.name,date:selDate,dateLabel:label,slot:slot.label});
+        close(); if(opts.onConfirm) opts.onConfirm({boatName:boat.name,dateLabel:label});
+      };
+      boatsR(); calR(); slotsR(); go();
+      return ov;
+    },
+
     /* ---- helpers ---- */
     money(n){ return "$"+Math.round(n).toLocaleString(); },
     isImage(v){ return typeof v==="string" && (v.startsWith("data:")||v.startsWith("http")||v.startsWith("/")); },
