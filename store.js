@@ -116,8 +116,10 @@
       {id:"full",  label:"Full day · 9:00–6:00"},
       {id:"sunset",label:"Sunset · 5:00–7:30"}
     ],
-    dayStatus(iso){                          // 'past' | 'booked' | 'limited' | 'open'
+    isBlocked(boat, iso){ return !!(boat && boat.blockedDates && boat.blockedDates.indexOf(iso)>-1); },
+    dayStatus(iso, boat){                    // 'past' | 'booked' | 'limited' | 'open'
       if(iso < this.NOW.slice(0,10)) return "past";
+      if(this.isBlocked(boat, iso)) return "booked";        // owner marked this boat booked on this date
       const d=parseInt(iso.slice(-2),10);
       if(d%13===0) return "booked";
       if([5,6,12,19,20,26].indexOf(d)>-1) return "limited";
@@ -196,18 +198,23 @@
         <div class="cbrx-f"><span class="cbrx-sum" data-sum>Select a date &amp; time</span>
           <div style="display:flex;gap:10px"><button class="cbrx-btn line" data-x>Cancel</button><button class="cbrx-btn go" data-go disabled>Confirm reschedule</button></div>
         </div></div>`;
+      function curBoat(){ return boats.find(b=>b.id===selBoat); }
       function boatsR(){
         ov.querySelector("[data-boats]").innerHTML=boats.map(b=>`<button class="cbrx-boat ${b.id===selBoat?'sel':''}" data-boat="${b.id}">${b.name}<small>${self.money(b.half)}–${self.money(b.full)}</small></button>`).join("");
-        ov.querySelectorAll("[data-boat]").forEach(el=>el.onclick=()=>{selBoat=el.dataset.boat;boatsR();go();});
+        ov.querySelectorAll("[data-boat]").forEach(el=>el.onclick=()=>{
+          selBoat=el.dataset.boat;
+          if(selDate && self.dayStatus(selDate, curBoat())!=="open" && self.dayStatus(selDate, curBoat())!=="limited"){ selDate=null; selSlot=null; }
+          boatsR(); calR(); slotsR(); go();     // availability is per-boat, so recompute the calendar
+        });
       }
       function calR(){
-        const y=month.getFullYear(), m=month.getMonth();
+        const y=month.getFullYear(), m=month.getMonth(), boat=curBoat();
         ov.querySelector("[data-ml]").textContent=month.toLocaleString("en-US",{month:"long",year:"numeric"});
         const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
         let h=["Su","Mo","Tu","We","Th","Fr","Sa"].map(d=>`<div class="cbrx-dow">${d}</div>`).join("");
         for(let i=0;i<first;i++) h+="<div></div>";
         for(let d=1;d<=days;d++){
-          const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`, st=self.dayStatus(iso);
+          const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`, st=self.dayStatus(iso, boat);
           const dis=st==="past"||st==="booked", sel=selDate===iso;
           h+=`<div class="cbrx-day ${dis?'dis':''} ${st==='limited'?'lim':''} ${sel?'sel':''}" ${dis?'':`data-day="${iso}"`}>${d}</div>`;
         }

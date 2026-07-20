@@ -211,6 +211,7 @@ tbody tr:hover{background:#fafcfe}
 .chip.available{color:var(--ok);background:var(--ok-bg)}
 .chip.limited{color:var(--warn);background:var(--warn-bg)}
 .chip.soldout{color:var(--muted);background:#eef2f6}
+.blocked-chip{display:inline-flex;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-top:6px;margin-left:6px;color:#4b3a86;background:#ece9fb}
 
 /* ---------- MODAL ---------- */
 .overlay{position:fixed;inset:0;background:rgba(8,22,36,.6);backdrop-filter:blur(4px);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
@@ -872,24 +873,58 @@ function renderFleet(){
         <div class="meta">${b.sub||''}</div>
         <div class="rate">${CBR.money(b.half)} half · ${CBR.money(b.full)} full</div>
         <span class="chip ${b.status}">${b.status==='soldout'?'Fully booked':(b.status==='limited'?'Limited':'Available')}</span>
+        ${(b.blockedDates&&b.blockedDates.length)?`<span class="blocked-chip">🗓 ${b.blockedDates.length} date${b.blockedDates.length>1?'s':''} booked</span>`:''}
       </div>
       <div class="acts">
-        <button class="mini book" onclick="toggleBooked('${b.id}')">${b.status==='soldout'?'✓ Mark available':'Mark booked'}</button>
+        <button class="mini book" onclick="openBlockDates('${b.id}')">🗓 Booked dates${(b.blockedDates&&b.blockedDates.length)?` (${b.blockedDates.length})`:''}</button>
         <button class="mini" onclick="openBoat('${b.id}')">Edit</button>
         <button class="mini danger" onclick="removeBoat('${b.id}')">Remove</button>
       </div>
     </div>`).join("");
 }
-function toggleBooked(id){
-  const b=CBR.getBoats().find(x=>x.id===id); if(!b) return;
-  if(b.status==="soldout"){
-    CBR.updateBoat(Object.assign({}, b, {status:"available", statusText:"Available"}));
-    toast(`${b.name} marked available`);
-  } else {
-    CBR.updateBoat(Object.assign({}, b, {status:"soldout", statusText:"Fully booked"}));
-    toast(`${b.name} marked fully booked`);
+function openBlockDates(id){
+  const boat=CBR.getBoats().find(x=>x.id===id); if(!boat) return;
+  CBR._reschedCSS();                                  // reuse the shared calendar styles
+  const sel=new Set(boat.blockedDates||[]);
+  let month=new Date(CBR.NOW.slice(0,7)+"-01T12:00:00");
+  const ov=document.createElement("div"); ov.className="cbrx-ov";
+  ov.innerHTML=`<div class="cbrx-m" style="max-width:460px">
+    <div class="cbrx-h"><h3>Mark booked dates — ${boat.name}</h3><button class="cbrx-x" data-x>×</button></div>
+    <div class="cbrx-b">
+      <p style="font-size:13px;color:#5d7186;margin:0 0 14px;line-height:1.5">Tap the dates this boat is unavailable — tap again to clear. Blocked dates show as booked on the public booking calendar. Pick as many as you like.</p>
+      <div class="cbrx-cal">
+        <div class="cbrx-cal-h"><button class="cbrx-nav" data-prev>‹</button><b data-ml></b><button class="cbrx-nav" data-next>›</button></div>
+        <div class="cbrx-grid" data-grid></div>
+        <div class="cbrx-legend"><span><i style="background:#1266b8"></i>Booked</span><span>Grey = past</span></div>
+      </div>
+    </div>
+    <div class="cbrx-f"><span class="cbrx-sum" data-count></span>
+      <div style="display:flex;gap:10px"><button class="cbrx-btn line" data-x>Cancel</button><button class="cbrx-btn go" data-save>Save booked dates</button></div>
+    </div></div>`;
+  function cal(){
+    const y=month.getFullYear(), m=month.getMonth();
+    ov.querySelector("[data-ml]").textContent=month.toLocaleString("en-US",{month:"long",year:"numeric"});
+    const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+    let h=["Su","Mo","Tu","We","Th","Fr","Sa"].map(d=>`<div class="cbrx-dow">${d}</div>`).join("");
+    for(let i=0;i<first;i++) h+="<div></div>";
+    for(let d=1;d<=days;d++){
+      const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`, past=iso<CBR.NOW.slice(0,10);
+      h+=`<div class="cbrx-day ${past?'dis':''} ${sel.has(iso)?'sel':''}" ${past?'':`data-day="${iso}"`}>${d}</div>`;
+    }
+    ov.querySelector("[data-grid]").innerHTML=h;
+    ov.querySelectorAll("[data-day]").forEach(el=>el.onclick=()=>{ const iso=el.dataset.day; sel.has(iso)?sel.delete(iso):sel.add(iso); cal(); count(); });
   }
-  renderAll();   // updates the fleet here + the public booking site (shared store)
+  function count(){ ov.querySelector("[data-count]").textContent = sel.size?`${sel.size} date${sel.size>1?'s':''} booked`:"No dates booked"; }
+  const close=()=>ov.remove();
+  ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
+  ov.querySelectorAll("[data-x]").forEach(el=>el.onclick=close);
+  ov.querySelector("[data-prev]").onclick=()=>{ month=new Date(month.getFullYear(),month.getMonth()-1,1); cal(); };
+  ov.querySelector("[data-next]").onclick=()=>{ month=new Date(month.getFullYear(),month.getMonth()+1,1); cal(); };
+  ov.querySelector("[data-save]").onclick=()=>{
+    CBR.updateBoat(Object.assign({}, boat, {blockedDates:[...sel].sort()}));
+    close(); renderAll(); toast(`${boat.name}: ${sel.size} date${sel.size===1?'':'s'} marked booked`);
+  };
+  cal(); count(); document.body.appendChild(ov);
 }
 
 /* ---------------- BOAT EDITOR ---------------- */
