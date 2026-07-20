@@ -229,11 +229,17 @@ footer a:hover{color:#fff}
 .day:hover:not(.disabled){border-color:var(--sky)}
 .day.disabled{color:#c4ced8;cursor:not-allowed;background:#fafbfc}
 .day.sel{background:var(--blue);color:#fff}
+.day.inrange{background:#dcecfa;color:var(--deep);border-radius:0}
 .day.low::after{content:"";position:absolute;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--sun)}
 .day.sel.low::after{background:#fff}
 .date-layout{display:grid;gap:16px;margin-top:4px}
 @media(min-width:640px){.date-layout{grid-template-columns:1.15fr .85fr;align-items:start}}
 .slots-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.multiday-card{border:1.5px solid var(--blue);background:#f3f9ff;border-radius:14px;padding:16px}
+.multiday-card b{font-size:16px;color:var(--navy);display:block}
+.multiday-card>span{font-size:13px;color:var(--muted);display:block;margin-top:2px}
+.multiday-card .md-rate{font-size:15px;font-weight:800;color:var(--navy);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.multiday-card .md-note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(min-width:640px){.slots{grid-template-columns:1fr}}
 .slot{border:1.5px solid var(--line);border-radius:12px;padding:13px;text-align:left;background:#fff;cursor:pointer;transition:.15s}
@@ -624,7 +630,7 @@ footer a:hover{color:#fff}
       <!-- STEP 2: DATE & TIME -->
       <div class="step-pane" data-pane="2">
         <div class="pane-title">Pick a date &amp; time</div>
-        <div class="pane-sub"><span class="dot" style="display:inline-block;background:var(--sun)"></span> = limited availability. Grey dates are fully booked.</div>
+        <div class="pane-sub">Pick one day, or tap a <b>start and end date</b> for a multi-day rental. <span class="dot" style="display:inline-block;background:var(--sun)"></span> = limited · grey = booked.</div>
         <div class="date-layout">
           <div class="cal">
             <div class="cal-head"><button class="cal-nav" onclick="changeMonth(-1)">‹</button><b id="calLabel"></b><button class="cal-nav" onclick="changeMonth(1)">›</button></div>
@@ -770,7 +776,7 @@ const TIME_SLOTS = [
 /* ---------------- STATE ---------------- */
 let step = 1;
 let calMonth = new Date(2026,6,1); // July 2026
-const state = {boat:"tritoon", date:null, dateLabel:"", slot:null, addons:{insurance:true}, uploaded:false};
+const state = {boat:"tritoon", date:null, endDate:null, dateLabel:"", slot:null, addons:{insurance:true}, uploaded:false};
 
 /* ---------------- HELPERS ---------------- */
 const $ = s=>document.querySelector(s);
@@ -803,45 +809,92 @@ function renderBoats(){
     </div>`).join("");
 }
 function pickBoat(k){
-  state.boat=k; renderBoats(); updateTotal();
-  // availability is per-boat: if the picked date is now blocked for this boat, clear it
+  state.boat=k; renderBoats();
+  // availability is per-boat: clear the date(s) if now unavailable for this boat
   if(state.date){
-    const iso=state.date.toISOString().slice(0,10);
-    if(CBR.isBlocked(BOATS[k], iso)){ state.date=null; state.slot=null; }
+    const s=state.date;
+    if(isDayDisabled(s.getFullYear(),s.getMonth(),s.getDate())){ state.date=null; state.endDate=null; state.slot=null; }
+    else if(state.endDate && rangeHasBlocked(state.date,state.endDate)){ state.endDate=null; state.slot=null; }
+    updateDateLabel();
   }
   renderCalendar();
 }
 
-/* ---------------- STEP 2: CALENDAR ---------------- */
+/* ---------------- STEP 2: CALENDAR (single day or multi-day range) ---------------- */
 function changeMonth(d){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+d,1);renderCalendar();}
+function isDayDisabled(y,m,d){
+  const date=new Date(y,m,d), today=new Date(2026,6,14);
+  const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  const booked=(d%13===0) || CBR.isBlocked(BOATS[state.boat], iso);
+  return date<today || booked || m!==6;   // season demo: only July bookable
+}
+function tripDays(){
+  if(!state.date) return 0;
+  if(!state.endDate) return 1;
+  return Math.round((state.endDate-state.date)/86400000)+1;
+}
+function rangeHasBlocked(start,end){
+  const cur=new Date(start);
+  while(cur<=end){
+    if(isDayDisabled(cur.getFullYear(),cur.getMonth(),cur.getDate())) return true;
+    cur.setDate(cur.getDate()+1);
+  }
+  return false;
+}
 function renderCalendar(){
   const y=calMonth.getFullYear(), m=calMonth.getMonth();
   $("#calLabel").textContent = calMonth.toLocaleString("en-US",{month:"long",year:"numeric"});
   const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
-  const today=new Date(2026,6,14);
   let html=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="dow">${d}</div>`).join("");
   for(let i=0;i<first;i++)html+=`<div></div>`;
-  const boat = BOATS[state.boat];
+  const t0=state.date?state.date.getTime():null, t1=state.endDate?state.endDate.getTime():null;
   for(let d=1;d<=days;d++){
-    const date=new Date(y,m,d);
+    const dt=new Date(y,m,d).getTime();
     const iso=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const past = date < today;
-    const booked = (d%13===0) || CBR.isBlocked(boat, iso); // demo bookings + owner-blocked dates for this boat
-    const low = ([5,6,12,19,20,26].includes(d)) && !booked; // limited
-    const disabled = past || booked || m!==6; // season demo: only July bookable
-    const sel = state.date && state.date.getTime()===date.getTime();
-    html+=`<div class="day ${disabled?'disabled':''} ${low?'low':''} ${sel?'sel':''}" ${disabled?'':`onclick="pickDate(${y},${m},${d})"`}>${d}</div>`;
+    const disabled = isDayDisabled(y,m,d);
+    const low = ([5,6,12,19,20,26].includes(d)) && !disabled;
+    const endpoint = (t0&&dt===t0) || (t1&&dt===t1);
+    const inrange = t0&&t1&&dt>t0&&dt<t1;
+    html+=`<div class="day ${disabled?'disabled':''} ${low?'low':''} ${endpoint?'sel':''} ${inrange?'inrange':''}" ${disabled?'':`onclick="pickDate(${y},${m},${d})"`}>${d}</div>`;
   }
   $("#calGrid").innerHTML=html;
-  renderSlots();
+  renderSlots(); updateTotal();
+}
+function updateDateLabel(){
+  if(!state.date){ state.dateLabel=""; return; }
+  if(state.endDate){
+    const o={month:"short",day:"numeric"};
+    state.dateLabel=`${state.date.toLocaleDateString("en-US",o)} – ${state.endDate.toLocaleDateString("en-US",o)} · ${tripDays()} days`;
+  } else {
+    state.dateLabel=state.date.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+  }
 }
 function pickDate(y,m,d){
-  state.date=new Date(y,m,d);
-  state.dateLabel=state.date.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+  const clicked=new Date(y,m,d);
+  if(!state.date || state.endDate || clicked<state.date){
+    state.date=clicked; state.endDate=null; state.slot=null;              // start a fresh selection
+  } else if(clicked.getTime()===state.date.getTime()){
+    state.endDate=null;                                                    // click start again → single day
+  } else if(rangeHasBlocked(state.date, clicked)){
+    toast("That range includes an unavailable day"); state.date=clicked; state.endDate=null; state.slot=null;
+  } else {
+    state.endDate=clicked; state.slot="full";                              // multi-day rental = full days
+  }
+  updateDateLabel();
   renderCalendar();
 }
 function renderSlots(){
   if(!state.date){$("#slotList").innerHTML=`<div style="grid-column:1/-1;color:var(--muted);font-size:13.5px;padding:8px 2px;border:1px dashed var(--line);border-radius:12px;text-align:center">Pick a date to see available times</div>`;return;}
+  if(state.endDate){                                    // multi-day rental → full days
+    const days=tripDays(), b=BOATS[state.boat];
+    $("#slotList").innerHTML=`<div class="multiday-card">
+      <b>🗓 ${days} full days</b>
+      <span>${state.dateLabel}</span>
+      <div class="md-rate">${money(b.full)} × ${days} = ${money(b.full*days)}</div>
+      <div class="md-note">Multi-day rentals are booked as full days. Want a half-day or sunset cruise? Pick a single date.</div>
+    </div>`;
+    return;
+  }
   $("#slotList").innerHTML = TIME_SLOTS.map(s=>{
     const gone = s.left===0;
     const sel = state.slot===s.id;
@@ -874,8 +927,10 @@ function fakeUpload(){
 /* ---------------- TOTALS ---------------- */
 function calcTotal(){
   const b=BOATS[state.boat];
+  const days=tripDays();
   let base = b.half;
-  if(state.slot){const s=TIME_SLOTS.find(x=>x.id===state.slot); base=Math.round(b.half*s.mult);}
+  if(days>1){ base = b.full*days; }                                        // multi-day = full-day rate per day
+  else if(state.slot){ const s=TIME_SLOTS.find(x=>x.id===state.slot); base=Math.round(b.half*s.mult); }
   let addons=0; ADDONS.forEach(a=>{if(state.addons[a.id])addons+=a.price;});
   const subtotal=base+addons;
   const deposit=Math.round(subtotal*0.3);
@@ -886,10 +941,13 @@ function updateTotal(){$("#footTotal").textContent=money(calcTotal().subtotal);}
 /* ---------------- STEP 5: SUMMARY ---------------- */
 function renderSummary(){
   const t=calcTotal();
-  const slot=state.slot?TIME_SLOTS.find(x=>x.id===state.slot).label:"—";
+  const days=tripDays();
+  const when = days>1 ? `${state.dateLabel} · Full days`
+                      : `${state.dateLabel||'Date TBD'} · ${state.slot?TIME_SLOTS.find(x=>x.id===state.slot).label:"—"}`;
+  const boatLine = days>1 ? `${t.b.name} · ${money(t.b.full)} × ${days} days` : t.b.name;
   let rows=`
-    <div class="sum-line"><span>${t.b.name}</span><b>${money(t.base)}</b></div>
-    <div class="sum-line"><span class="muted">${state.dateLabel||'Date TBD'} · ${slot}</span><span></span></div>`;
+    <div class="sum-line"><span>${boatLine}</span><b>${money(t.base)}</b></div>
+    <div class="sum-line"><span class="muted">${when}</span><span></span></div>`;
   ADDONS.forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
   rows+=`
     <div class="sum-line tot"><span>Trip total</span><span>${money(t.subtotal)}</span></div>
@@ -903,13 +961,16 @@ function renderSummary(){
 function confirmBooking(){
   const code="CBR-"+Math.random().toString(36).slice(2,7).toUpperCase();
   const t=calcTotal();
-  const slot=state.slot?TIME_SLOTS.find(x=>x.id===state.slot).label:"";
+  const days=tripDays();
+  const slot = days>1 ? `${days} full days` : (state.slot?TIME_SLOTS.find(x=>x.id===state.slot).label:"");
   // Record the rental so it shows up in the owner dashboard.
   CBR.addBooking({
     code, name:(($("#f-first").value||"")+" "+($("#f-last").value||"")).trim()||"Guest",
     phone:$("#f-phone").value||"", email:$("#f-email").value||"",
     boatId:state.boat, boatName:t.b.name,
-    date: state.date?state.date.toISOString().slice(0,10):"", dateLabel: state.dateLabel||"",
+    date: state.date?state.date.toISOString().slice(0,10):"",
+    endDate: state.endDate?state.endDate.toISOString().slice(0,10):null, days,
+    dateLabel: state.dateLabel||"",
     slot, subtotal:t.subtotal, deposit:t.deposit,
     status:"confirmed", createdAt:new Date().toISOString().slice(0,10),
     balancePaid:false, payMethod:null, cashOnly:false, insurance:!!state.addons.insurance
