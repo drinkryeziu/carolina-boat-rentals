@@ -5,7 +5,7 @@
    no real backend, and the login is a demo gate, not security.
    ============================================================ */
 (function(){
-  const BOATS_KEY = "cbr_boats_v2";
+  const BOATS_KEY = "cbr_boats_v3";
   const BOOK_KEY  = "cbr_bookings_v4";
 
   const DEFAULT_BOATS = [
@@ -15,7 +15,7 @@
       desc:"Our flagship party boat — plush seating, a swim ladder, and a built-in slide. Perfect for bachelorettes and big groups.",
       capacity:12, half:499, full:799,
       tags:["👥 Up to 12","⚡ 250 HP","🔊 Bluetooth audio","🪜 Waterslide"],
-      image:"linear-gradient(135deg,#2e9fe0,#0f3a5f)",
+      image:"images/luxury-tritoon.jpg",
       status:"limited", statusText:"3 left this week"
     },
     {
@@ -24,7 +24,7 @@
       desc:"Comfortable, easy to drive, and roomy — the go-to for families and relaxed lake days.",
       capacity:10, half:349, full:579,
       tags:["👥 Up to 10","☀️ Shade top","🧊 Cooler included","🔊 Speakers"],
-      image:"linear-gradient(135deg,#38c1c9,#123a5c)",
+      image:"images/classic-pontoon.webp",
       status:"available", statusText:"Available"
     },
     {
@@ -250,8 +250,8 @@
 
     /* ---- helpers ---- */
     money(n){ return "$"+Math.round(n).toLocaleString(); },
-    isImage(v){ return typeof v==="string" && (v.startsWith("data:")||v.startsWith("http")||v.startsWith("/")); },
-    bg(v){ return this.isImage(v) ? `center/cover no-repeat url("${v}")` : v; },
+    isImage(v){ return typeof v==="string" && (v.startsWith("data:")||v.startsWith("http")||v.startsWith("/")||/\.(jpe?g|png|webp|gif|avif)$/i.test(v)); },
+    bg(v){ return this.isImage(v) ? `center/cover no-repeat url('${v}')` : v; },
     slug(s){ return (s||"boat").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+"-"+Math.random().toString(36).slice(2,5); }
   };
 })();
