@@ -6,7 +6,16 @@
    ============================================================ */
 (function(){
   const BOATS_KEY = "cbr_boats_v3";
-  const BOOK_KEY  = "cbr_bookings_v4";
+  const BOOK_KEY  = "cbr_bookings_v5";
+
+  // Shared add-ons (extras) — used by the public booking flow, the walk-up POS, and the dashboard.
+  const ADDONS = [
+    {id:"insurance", name:"Damage & Weather Protection", sub:"Cancel any reason + deposit waived", price:39, icon:"🛡️", rec:true},
+    {id:"captain",   name:"Add a licensed captain",       sub:"Sit back — we'll drive (4 hrs)",    price:199, icon:"🧭"},
+    {id:"tube",      name:"Towable tube + rope",          sub:"Big-kid fun behind the boat",        price:49,  icon:"🌀"},
+    {id:"cooler",    name:"Stocked cooler + ice",         sub:"Water, sodas & ice ready to go",     price:35,  icon:"🧊"},
+    {id:"delivery",  name:"Dock delivery to your Airbnb", sub:"We bring the boat to you",           price:95,  icon:"🚚"}
+  ];
 
   const DEFAULT_BOATS = [
     {
@@ -49,13 +58,13 @@
 
   // Seed sample rentals so the dashboard looks alive for the pitch.
   const DEFAULT_BOOKINGS = [
-    {code:"CBR-8K2QP", name:"Megan Kessler",  phone:"(704) 555-0132", email:"megan.k@email.com",  boatId:"tritoon",   boatName:"Luxury Tritoon",    date:"2026-07-05", dateLabel:"Sat, Jul 5",  slot:"Full day · 9:00–6:00",   subtotal:838, deposit:251, status:"completed", createdAt:"2026-06-28", balancePaid:true,  payMethod:"card", cashOnly:false, insurance:false},
-    {code:"CBR-4M9RT", name:"David Rowe",      phone:"(980) 555-0148", email:"drowe@email.com",     boatId:"pontoon",   boatName:"Classic Pontoon",   date:"2026-07-11", dateLabel:"Sat, Jul 11", slot:"Afternoon · 2:00–6:00",  subtotal:483, deposit:145, status:"completed", createdAt:"2026-07-02", balancePaid:true,  payMethod:"cash", cashOnly:true,  insurance:false},
-    {code:"CBR-1XZ7C", name:"Ashley Lin",      phone:"(704) 555-0175", email:"ashley.lin@email.com",boatId:"tour",      boatName:"Guided Sunset Tour",date:"2026-07-12", dateLabel:"Sun, Jul 12", slot:"Sunset · 5:00–7:30",     subtotal:389, deposit:117, status:"completed", createdAt:"2026-07-04", balancePaid:true,  payMethod:"card", cashOnly:false, insurance:false},
-    {code:"CBR-3NR7X", name:"Nathan Cole",     phone:"(704) 555-0158", email:"ncole@email.com",     boatId:"waverunner",boatName:"Waverunners",       date:"2026-07-15", dateLabel:"Wed, Jul 15", slot:"Afternoon · 2:00–6:00",  subtotal:338, deposit:101, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:false, insurance:false},
-    {code:"CBR-6P3WD", name:"Carlos Mendez",   phone:"(704) 555-0190", email:"cmendez@email.com",   boatId:"waverunner",boatName:"Waverunners",       date:"2026-07-18", dateLabel:"Sat, Jul 18", slot:"Morning · 9:00–1:00",    subtotal:338, deposit:101, status:"confirmed", createdAt:"2026-07-10", balancePaid:false, payMethod:null,   cashOnly:false, insurance:false},
-    {code:"CBR-9T5HG", name:"Priya Nair",      phone:"(980) 555-0166", email:"priya.n@email.com",   boatId:"tritoon",   boatName:"Luxury Tritoon",    date:"2026-07-19", dateLabel:"Sun, Jul 19", slot:"Full day · 9:00–6:00",   subtotal:837, deposit:251, status:"confirmed", createdAt:"2026-07-11", balancePaid:false, payMethod:null,   cashOnly:false, insurance:true},
-    {code:"CBR-2B8KL", name:"Jordan Blake",    phone:"(704) 555-0123", email:"jblake@email.com",    boatId:"pontoon",   boatName:"Classic Pontoon",   date:"2026-07-25", dateLabel:"Sat, Jul 25", slot:"Full day · 9:00–6:00",   subtotal:614, deposit:184, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:true,  insurance:false}
+    {code:"CBR-8K2QP", name:"Megan Kessler",  phone:"(704) 555-0132", email:"megan.k@email.com",  boatId:"tritoon",   boatName:"Luxury Tritoon",    date:"2026-07-05", dateLabel:"Sat, Jul 5",  slot:"Full day · 9:00–6:00",   base:799, addons:["insurance"],       subtotal:838, deposit:251, status:"completed", createdAt:"2026-06-28", balancePaid:true,  payMethod:"card", cashOnly:false, insurance:true},
+    {code:"CBR-4M9RT", name:"David Rowe",      phone:"(980) 555-0148", email:"drowe@email.com",     boatId:"pontoon",   boatName:"Classic Pontoon",   date:"2026-07-11", dateLabel:"Sat, Jul 11", slot:"Afternoon · 2:00–6:00",  base:483, addons:[],                  subtotal:483, deposit:145, status:"completed", createdAt:"2026-07-02", balancePaid:true,  payMethod:"cash", cashOnly:true,  insurance:false},
+    {code:"CBR-1XZ7C", name:"Ashley Lin",      phone:"(704) 555-0175", email:"ashley.lin@email.com",boatId:"tour",      boatName:"Guided Sunset Tour",date:"2026-07-12", dateLabel:"Sun, Jul 12", slot:"Sunset · 5:00–7:30",     base:389, addons:[],                  subtotal:389, deposit:117, status:"completed", createdAt:"2026-07-04", balancePaid:true,  payMethod:"card", cashOnly:false, insurance:false},
+    {code:"CBR-3NR7X", name:"Nathan Cole",     phone:"(704) 555-0158", email:"ncole@email.com",     boatId:"waverunner",boatName:"Waverunners",       date:"2026-07-15", dateLabel:"Wed, Jul 15", slot:"Afternoon · 2:00–6:00",  base:289, addons:["tube"],            subtotal:338, deposit:101, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:false, insurance:false},
+    {code:"CBR-6P3WD", name:"Carlos Mendez",   phone:"(704) 555-0190", email:"cmendez@email.com",   boatId:"waverunner",boatName:"Waverunners",       date:"2026-07-18", dateLabel:"Sat, Jul 18", slot:"Morning · 9:00–1:00",    base:338, addons:[],                  subtotal:338, deposit:101, status:"confirmed", createdAt:"2026-07-10", balancePaid:false, payMethod:null,   cashOnly:false, insurance:false},
+    {code:"CBR-9T5HG", name:"Priya Nair",      phone:"(980) 555-0166", email:"priya.n@email.com",   boatId:"tritoon",   boatName:"Luxury Tritoon",    date:"2026-07-19", dateLabel:"Sun, Jul 19", slot:"Full day · 9:00–6:00",   base:798, addons:["insurance"],       subtotal:837, deposit:251, status:"confirmed", createdAt:"2026-07-11", balancePaid:false, payMethod:null,   cashOnly:false, insurance:true},
+    {code:"CBR-2B8KL", name:"Jordan Blake",    phone:"(704) 555-0123", email:"jblake@email.com",    boatId:"pontoon",   boatName:"Classic Pontoon",   date:"2026-07-25", dateLabel:"Sat, Jul 25", slot:"Full day · 9:00–6:00",   base:530, addons:["cooler","delivery"],subtotal:660, deposit:184, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:true,  insurance:false}
   ];
 
   function read(key, fallback){
@@ -86,6 +95,20 @@
     updateBooking(code, patch){ const b=this.getBookings().map(x=>x.code===code?Object.assign({},x,patch):x); write(BOOK_KEY,b); return b; },
     getBooking(code){ return this.getBookings().find(x=>x.code===code); },
     resetAll(){ localStorage.removeItem(BOATS_KEY); localStorage.removeItem(BOOK_KEY); },
+
+    /* ---- add-ons / extras (shared) ---- */
+    ADDONS: ADDONS,
+    addon(id){ return ADDONS.find(a=>a.id===id); },
+    addonList(ids){ return (ids||[]).map(id=>this.addon(id)).filter(Boolean); },
+    addonsSum(ids){ return this.addonList(ids).reduce((s,a)=>s+a.price,0); },
+    bookingBase(b){ return (b.base!=null) ? b.base : ((b.subtotal||0) - this.addonsSum(b.addons)); },
+    // recompute subtotal (base + selected extras) and persist a booking's extras
+    setBookingAddons(code, ids){
+      const b=this.getBooking(code); if(!b) return;
+      const base=this.bookingBase(b);
+      const subtotal=base + this.addonsSum(ids);
+      return this.updateBooking(code, { base, addons:ids.slice(), subtotal, insurance: ids.indexOf("insurance")>-1 });
+    },
 
     /* ---- cancellation / refund policy (shared by dashboard + public site) ---- */
     NOW: "2026-07-14T10:00:00",           // fixed "now" for the demo

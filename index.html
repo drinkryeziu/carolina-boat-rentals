@@ -759,13 +759,7 @@ function renderHeroSelect(){
   sel.innerHTML = FLEET.filter(b=>b.status!=="soldout")
     .map(b=>`<option value="${b.id}">${b.name} — from ${CBR.money(b.half)}</option>`).join("");
 }
-const ADDONS = [
-  {id:"insurance", name:"Damage & Weather Protection", sub:"Cancel any reason + deposit waived", price:39, icon:"🛡️", rec:true},
-  {id:"captain",   name:"Add a licensed captain",       sub:"Sit back — we'll drive (4 hrs)",   price:199, icon:"🧭"},
-  {id:"tube",      name:"Towable tube + rope",          sub:"Big-kid fun behind the boat",       price:49,  icon:"🌀"},
-  {id:"cooler",    name:"Stocked cooler + ice",         sub:"Water, sodas & ice ready to go",    price:35,  icon:"🧊"},
-  {id:"delivery",  name:"Dock delivery to your Airbnb", sub:"We bring the boat to you",          price:95,  icon:"🚚"}
-];
+const ADDONS = CBR.ADDONS;   // shared add-ons list (store.js)
 const TIME_SLOTS = [
   {id:"am",  label:"Morning · 9:00–1:00",  sub:"Half day",  mult:1,    left:3},
   {id:"pm",  label:"Afternoon · 2:00–6:00",sub:"Half day",  mult:1,    left:1},
@@ -971,7 +965,8 @@ function confirmBooking(){
     date: state.date?state.date.toISOString().slice(0,10):"",
     endDate: state.endDate?state.endDate.toISOString().slice(0,10):null, days,
     dateLabel: state.dateLabel||"",
-    slot, subtotal:t.subtotal, deposit:t.deposit,
+    slot, base:t.base, addons:ADDONS.filter(a=>state.addons[a.id]).map(a=>a.id),
+    subtotal:t.subtotal, deposit:t.deposit,
     status:"confirmed", createdAt:new Date().toISOString().slice(0,10),
     balancePaid:false, payMethod:null, cashOnly:false, insurance:!!state.addons.insurance
   });

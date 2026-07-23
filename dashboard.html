@@ -179,6 +179,26 @@ tbody tr:hover{background:#fafcfe}
 }
 .wu-chip{display:inline-block;font-size:10.5px;font-weight:700;color:#6b4e12;background:#fdf0d5;padding:2px 7px;border-radius:6px;margin-top:4px}
 
+/* ---------- EXPANDABLE EXTRAS ---------- */
+.guest-inner{display:flex;align-items:flex-start;gap:9px}
+.exp-btn{flex:0 0 auto;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);background:#fff;color:var(--blue);font-size:15px;font-weight:800;line-height:1;display:grid;place-items:center;cursor:pointer;margin-top:1px}
+.exp-btn:hover{border-color:var(--blue);background:#eaf3fb}
+.exp-btn.open{background:var(--blue);color:#fff;border-color:var(--blue)}
+.drow>td{background:#f7fafc;padding:0 16px}
+.extras{padding:14px 4px 16px}
+.ex-head{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px}
+.ex-base{font-size:13.5px;color:#33485e;margin-bottom:10px}
+.ex-base b{color:var(--navy)}
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.ex-item{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;cursor:pointer;font-size:13px}
+.ex-item.on{border-color:var(--ok);background:var(--ok-bg)}
+.ex-item input{width:16px;height:16px;accent-color:var(--ok);cursor:pointer;flex:0 0 auto}
+.ex-item .ex-ic{font-size:16px}
+.ex-item .ex-nm{color:var(--navy);font-weight:600;line-height:1.2}
+.ex-item .ex-nm small{display:block;font-weight:700;color:var(--muted);font-size:11px}
+.ex-tot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;font-weight:700;color:var(--navy)}
+.ex-note{font-size:11.5px;color:var(--muted);margin-top:6px}
+
 /* ---------- WALK-UP BOOKING ---------- */
 .tb-btn.gold{background:linear-gradient(180deg,var(--sun),var(--sun-deep));color:#3a2500;border-color:transparent}
 .tb-btn.gold:hover{box-shadow:0 6px 16px rgba(245,147,0,.35);color:#3a2500}
@@ -413,7 +433,12 @@ tbody tr:hover{background:#fafcfe}
         <div class="f"><label>Duration</label><select id="wu-dur" onchange="wuPrice()">
           <option value="half">Half day</option><option value="full">Full day</option><option value="sunset">Sunset (2.5h)</option>
         </select></div>
-        <div class="f"><label>Trip total ($)</label><input id="wu-total" type="number" min="0" oninput="wuTotalChanged()" /></div>
+        <div class="f"><label>Boat price ($)</label><input id="wu-total" type="number" min="0" oninput="wuTotalChanged()" /></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="ex-head">Add extras (optional)</div>
+        <div class="ex-grid" id="wu-extras"></div>
       </div>
 
       <div class="pay-split-box">
@@ -449,6 +474,7 @@ const CREDS={user:"owner",pass:"lakenorman"};
 const TODAY="2026-07-14";
 let editingImage=null, editingId=null;
 let rentalTab="all";
+let expanded=new Set();   // rental rows expanded to show extras
 
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400);}
 
@@ -537,9 +563,14 @@ function renderRentals(){
   let rows=all.filter(b=>rentalMatches(b,term,dateVal));
   if(rentalTab==="charge") rows=rows.filter(b=>!b.balancePaid && b.status!=="cancelled");
 
-  $("#rentalRows").innerHTML=rows.map(b=>`
+  $("#rentalRows").innerHTML=rows.map(b=>{
+    const open=expanded.has(b.code), nEx=(b.addons||[]).length;
+    return `
     <tr>
-      <td class="guest"><b>${b.name}</b><span>${b.phone||b.email||""}</span>${b.source==="walk-up"?'<span class="wu-chip">🎫 Walk-up</span>':''}</td>
+      <td class="guest"><div class="guest-inner">
+        <button class="exp-btn ${open?'open':''}" title="Show extras" onclick="toggleExpand('${b.code}')">${open?'−':'+'}</button>
+        <div><b>${b.name}</b><span>${b.phone||b.email||""}</span>${b.source==="walk-up"?'<span class="wu-chip">🎫 Walk-up</span>':''}${nEx?`<span class="wu-chip" style="color:#25506f;background:#eaf3fb">＋${nEx} extra${nEx>1?'s':''}</span>`:''}</div>
+      </div></td>
       <td>${b.boatName}</td>
       <td>${b.dateLabel||b.date}<div style="font-size:12px;color:var(--muted)">${(b.slot||"").split(" · ")[0]}</div></td>
       <td class="money">${CBR.money(b.subtotal||0)}</td>
@@ -547,7 +578,8 @@ function renderRentals(){
       <td>${balanceCell(b)}</td>
       <td><span class="status ${b.status||'confirmed'}"><span class="d"></span>${(b.status||'confirmed').replace(/^\w/,c=>c.toUpperCase())}</span></td>
       <td><button class="inv-btn" onclick="showInvoice('${b.code}')">🧾 Invoice</button>${cancellable(b)?`<button class="cancel-link" onclick="showCancel('${b.code}')">Cancel / refund</button>`:''}</td>
-    </tr>`).join("") || `<tr class="empty-row"><td colspan="8">${all.length?"No rentals match your filters.":"No bookings yet."}</td></tr>`;
+    </tr>${open?`<tr class="drow"><td colspan="8">${extrasPanel(b)}</td></tr>`:''}`;
+  }).join("") || `<tr class="empty-row"><td colspan="8">${all.length?"No rentals match your filters.":"No bookings yet."}</td></tr>`;
 
   // badges + summary (from active, non-cancelled bookings)
   const unpaid=all.filter(b=>!b.balancePaid && b.status!=="cancelled");
@@ -557,6 +589,34 @@ function renderRentals(){
   $("#collectFig").innerHTML = unpaid.length
     ? `To collect at dock<b>${CBR.money(due)}</b>${unpaid.length} trip${unpaid.length>1?'s':''}`
     : `<b style="color:var(--ok)">All balances collected ✓</b>`;
+}
+function extrasPanel(b){
+  const base=CBR.bookingBase(b);
+  const slot=(b.slot||"rental").split(" · ")[0];
+  const items=CBR.ADDONS.map(a=>{
+    const on=(b.addons||[]).indexOf(a.id)>-1;
+    return `<label class="ex-item ${on?'on':''}">
+      <input type="checkbox" ${on?'checked':''} onchange="toggleExtra('${b.code}','${a.id}')">
+      <span class="ex-ic">${a.icon}</span>
+      <span class="ex-nm">${a.name}<small>+ ${CBR.money(a.price)}</small></span>
+    </label>`;
+  }).join("");
+  return `<div class="extras">
+    <div class="ex-head">What they ordered — extras</div>
+    <div class="ex-base">${b.boatName} — ${slot} · rental <b>${CBR.money(base)}</b></div>
+    <div class="ex-grid">${items}</div>
+    <div class="ex-tot"><span>Trip total (rental + extras)</span><b>${CBR.money(b.subtotal||0)}</b></div>
+    <div class="ex-note">Tick an extra the guest adds — the total, balance due, and invoice update automatically.</div>
+  </div>`;
+}
+function toggleExpand(code){ expanded.has(code)?expanded.delete(code):expanded.add(code); renderRentals(); }
+function toggleExtra(code, id){
+  const b=CBR.getBooking(code); const ids=(b.addons||[]).slice();
+  const i=ids.indexOf(id); const adding=i<0;
+  if(adding) ids.push(id); else ids.splice(i,1);
+  CBR.setBookingAddons(code, ids);
+  renderAll();
+  toast(`${adding?'Added':'Removed'} ${CBR.addon(id).name}`);
 }
 function setTab(t){
   rentalTab=t;
@@ -664,7 +724,8 @@ function showInvoice(code){
         <table class="inv-table">
           <thead><tr><th>Description</th><th class="r">Amount</th></tr></thead>
           <tbody>
-            <tr><td>${b.boatName} — ${b.slot||"rental"}</td><td class="r">${CBR.money(b.subtotal||0)}</td></tr>
+            <tr><td>${b.boatName} — ${b.slot||"rental"}</td><td class="r">${CBR.money(CBR.bookingBase(b))}</td></tr>
+            ${CBR.addonList(b.addons).map(a=>`<tr><td>${a.icon} ${a.name}</td><td class="r">${CBR.money(a.price)}</td></tr>`).join("")}
           </tbody>
         </table>
         <div class="inv-tot">
@@ -786,6 +847,7 @@ function markCashPaid(code){
 /* ---------------- WALK-UP BOOKING (dock point-of-sale) ---------------- */
 const DURS={half:b=>b.half, full:b=>b.full, sunset:b=>Math.round((b.half||0)*0.85)};
 const DUR_LABEL={half:"Half day",full:"Full day",sunset:"Sunset (2.5h)"};
+let wuAddons=new Set();   // extras selected on the walk-up booking
 
 function openWalkup(){
   const boats=CBR.getBoats();
@@ -793,35 +855,47 @@ function openWalkup(){
   $("#wu-boat").innerHTML=boats.map(b=>`<option value="${b.id}">${b.name} · ${CBR.money(b.half)}–${CBR.money(b.full)}</option>`).join("");
   $("#wu-first").value=""; $("#wu-last").value=""; $("#wu-phone").value=""; $("#wu-email").value="";
   $("#wu-date").value=TODAY; $("#wu-dur").value="half";
+  wuAddons=new Set(); wuRenderExtras();
   wuPrice();
   $("#wuOverlay").classList.add("open");
 }
 function closeWalkup(){ $("#wuOverlay").classList.remove("open"); }
 $("#wuOverlay").addEventListener("click",e=>{ if(e.target.id==="wuOverlay") closeWalkup(); });
 
-function wuTotal(){ return Math.max(0, parseInt($("#wu-total").value,10)||0); }
-function wuPrice(){                    // recompute suggested total from boat + duration
+function wuTotal(){ return Math.max(0, parseInt($("#wu-total").value,10)||0); }   // boat price
+function wuExtrasSum(){ let s=0; wuAddons.forEach(id=>{ const a=CBR.addon(id); if(a) s+=a.price; }); return s; }
+function wuGrand(){ return wuTotal()+wuExtrasSum(); }                            // boat + extras
+function wuRenderExtras(){
+  $("#wu-extras").innerHTML=CBR.ADDONS.map(a=>{
+    const on=wuAddons.has(a.id);
+    return `<label class="ex-item ${on?'on':''}"><input type="checkbox" ${on?'checked':''} onchange="wuToggleExtra('${a.id}')">
+      <span class="ex-ic">${a.icon}</span><span class="ex-nm">${a.name}<small>+ ${CBR.money(a.price)}</small></span></label>`;
+  }).join("");
+}
+function wuToggleExtra(id){ wuAddons.has(id)?wuAddons.delete(id):wuAddons.add(id); wuRenderExtras(); wuTotalChanged(); }
+function wuPrice(){                    // recompute boat price from boat + duration
   const b=CBR.getBoats().find(x=>x.id===$("#wu-boat").value);
   const calc=DURS[$("#wu-dur").value]||DURS.half;
   $("#wu-total").value = b?calc(b):0;
   wuTotalChanged();
 }
-function wuTotalChanged(){ const t=wuTotal(); $("#wu-card").value=t; $("#wu-cash").value=0; wuStatus(); }
-function wuSplit(side){                // typing one side auto-balances the other to the total
-  const t=wuTotal();
+function wuTotalChanged(){ const t=wuGrand(); $("#wu-card").value=t; $("#wu-cash").value=0; wuStatus(); }
+function wuSplit(side){                // typing one side auto-balances the other to the grand total
+  const t=wuGrand();
   let card=parseInt($("#wu-card").value,10)||0, cash=parseInt($("#wu-cash").value,10)||0;
   if(side==="card"){ card=Math.min(Math.max(card,0),t); cash=t-card; }
   else            { cash=Math.min(Math.max(cash,0),t); card=t-cash; }
   $("#wu-card").value=card; $("#wu-cash").value=cash; wuStatus();
 }
-function wuAllCard(){ const t=wuTotal(); $("#wu-card").value=t; $("#wu-cash").value=0; wuStatus(); }
-function wuAllCash(){ const t=wuTotal(); $("#wu-cash").value=t; $("#wu-card").value=0; wuStatus(); }
-function wuSplitEven(){ const t=wuTotal(); const c=Math.round(t/2); $("#wu-card").value=c; $("#wu-cash").value=t-c; wuStatus(); }
+function wuAllCard(){ const t=wuGrand(); $("#wu-card").value=t; $("#wu-cash").value=0; wuStatus(); }
+function wuAllCash(){ const t=wuGrand(); $("#wu-cash").value=t; $("#wu-card").value=0; wuStatus(); }
+function wuSplitEven(){ const t=wuGrand(); const c=Math.round(t/2); $("#wu-card").value=c; $("#wu-cash").value=t-c; wuStatus(); }
 function wuStatus(){
-  const t=wuTotal(), card=parseInt($("#wu-card").value,10)||0, cash=parseInt($("#wu-cash").value,10)||0;
+  const t=wuGrand(), card=parseInt($("#wu-card").value,10)||0, cash=parseInt($("#wu-cash").value,10)||0;
   const rem=t-card-cash, el=$("#wu-psstatus");
-  $("#wu-totlabel").textContent=CBR.money(t);
-  if(t<=0){ el.className="ps-status warn"; el.textContent="Enter a trip total to collect."; $("#wu-save").disabled=true; return; }
+  const ex=wuExtrasSum();
+  $("#wu-totlabel").textContent = ex ? `${CBR.money(t)} (${CBR.money(wuTotal())} + ${CBR.money(ex)} extras)` : CBR.money(t);
+  if(t<=0){ el.className="ps-status warn"; el.textContent="Enter a boat price to collect."; $("#wu-save").disabled=true; return; }
   if(rem!==0){ el.className="ps-status warn"; el.textContent=rem>0?`Allocate ${CBR.money(rem)} more`:`Over by ${CBR.money(-rem)}`; $("#wu-save").disabled=true; return; }
   el.className="ps-status ok";
   el.textContent = (card&&cash) ? `✓ ${CBR.money(card)} card + ${CBR.money(cash)} cash` : (card?`✓ ${CBR.money(card)} on card`:`✓ ${CBR.money(cash)} in cash`);
@@ -829,20 +903,22 @@ function wuStatus(){
 }
 function saveWalkup(){
   const first=$("#wu-first").value.trim(), last=$("#wu-last").value.trim();
-  const t=wuTotal(), card=parseInt($("#wu-card").value,10)||0, cash=parseInt($("#wu-cash").value,10)||0;
+  const t=wuGrand(), card=parseInt($("#wu-card").value,10)||0, cash=parseInt($("#wu-cash").value,10)||0;
   if(!first){ toast("Add the guest's name"); return; }
   if(!$("#wu-phone").value.trim()){ toast("Add a mobile phone"); return; }
-  if(t<=0 || card+cash!==t){ toast("Card + cash must equal the trip total"); return; }
+  if(t<=0 || card+cash!==t){ toast("Card + cash must equal the total"); return; }
   const boat=CBR.getBoats().find(x=>x.id===$("#wu-boat").value);
   const dv=$("#wu-date").value||TODAY;
   const d=new Date(dv+"T12:00:00");
   const method = (card&&cash) ? "split" : (cash?"cash":"card");
+  const addons=[...wuAddons];
   CBR.addBooking({
     code:"CBR-"+Math.random().toString(36).slice(2,7).toUpperCase(),
     name:(first+" "+last).trim(), phone:$("#wu-phone").value.trim(), email:$("#wu-email").value.trim(),
     boatId:boat?boat.id:"", boatName:boat?boat.name:"Boat",
     date:dv, dateLabel:d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}),
-    slot:DUR_LABEL[$("#wu-dur").value], subtotal:t, deposit:0,
+    slot:DUR_LABEL[$("#wu-dur").value], base:wuTotal(), addons, insurance:addons.indexOf("insurance")>-1,
+    subtotal:t, deposit:0,
     status: dv<TODAY?"completed":"confirmed",
     createdAt:TODAY, balancePaid:true, payMethod:method, cardAmount:card, cashAmount:cash, source:"walk-up"
   });
