@@ -161,10 +161,10 @@ tbody tr:hover{background:#fafcfe}
 .inv-parties{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px}
 .inv-parties h5{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 5px}
 .inv-parties div{font-size:13.5px;color:var(--ink);line-height:1.5}
-.inv-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.inv-table{width:100%;min-width:0;border-collapse:collapse;margin-bottom:16px;table-layout:fixed}
 .inv-table th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
-.inv-table td{font-size:13.5px;padding:10px;border-bottom:1px solid #eef2f6}
-.inv-table td.r,.inv-table th.r{text-align:right}
+.inv-table td{font-size:13.5px;padding:10px;border-bottom:1px solid #eef2f6;overflow-wrap:break-word}
+.inv-table td.r,.inv-table th.r{text-align:right;width:96px;white-space:nowrap;font-weight:700;color:var(--navy)}
 .inv-tot{margin-left:auto;width:260px;max-width:100%}
 .inv-tot .l{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;color:#33485e}
 .inv-tot .l.grand{border-top:1.5px solid var(--navy);margin-top:6px;padding-top:10px;font-size:16px;font-weight:800;color:var(--navy)}
