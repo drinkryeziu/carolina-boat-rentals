@@ -5,11 +5,12 @@
    no real backend, and the login is a demo gate, not security.
    ============================================================ */
 (function(){
-  const BOATS_KEY = "cbr_boats_v3";
-  const BOOK_KEY  = "cbr_bookings_v5";
+  const BOATS_KEY  = "cbr_boats_v4";
+  const BOOK_KEY   = "cbr_bookings_v5";
+  const ADDONS_KEY = "cbr_addons_v1";
 
-  // Shared add-ons (extras) — used by the public booking flow, the walk-up POS, and the dashboard.
-  const ADDONS = [
+  // Editable extras catalog. Each boat picks which of these it offers (boat.extras = [ids]).
+  const DEFAULT_ADDONS = [
     {id:"insurance", name:"Damage & Weather Protection", sub:"Cancel any reason + deposit waived", price:39, icon:"🛡️", rec:true},
     {id:"captain",   name:"Add a licensed captain",       sub:"Sit back — we'll drive (4 hrs)",    price:199, icon:"🧭"},
     {id:"tube",      name:"Towable tube + rope",          sub:"Big-kid fun behind the boat",        price:49,  icon:"🌀"},
@@ -25,6 +26,7 @@
       capacity:12, half:499, full:799,
       tags:["👥 Up to 12","⚡ 250 HP","🔊 Bluetooth audio","🪜 Waterslide"],
       image:"images/luxury-tritoon.jpg",
+      extras:["insurance","captain","tube","cooler","delivery"],
       status:"limited", statusText:"3 left this week"
     },
     {
@@ -34,6 +36,7 @@
       capacity:10, half:349, full:579,
       tags:["👥 Up to 10","☀️ Shade top","🧊 Cooler included","🔊 Speakers"],
       image:"images/classic-pontoon.webp",
+      extras:["insurance","tube","cooler","delivery"],
       status:"available", statusText:"Available"
     },
     {
@@ -43,6 +46,7 @@
       capacity:3, half:299, full:549,
       tags:["👥 Up to 3","🏁 Sea-Doo","🦺 Vests incl.","⚡ 3-seater"],
       image:"linear-gradient(135deg,#ffb020,#f59300)",
+      extras:["insurance","tube"],
       status:"available", statusText:"5 available"
     },
     {
@@ -52,6 +56,7 @@
       capacity:8, half:389, full:389,
       tags:["🧭 Captained","🌅 2.5 hours","👥 Up to 8","📸 Photo stops"],
       image:"linear-gradient(135deg,#ff9a5a,#c0431f)",
+      extras:["insurance","cooler"],
       status:"available", statusText:"Available"
     }
   ];
@@ -94,13 +99,20 @@
     addBooking(bk){ const b=this.getBookings(); b.unshift(bk); write(BOOK_KEY,b); return b; },
     updateBooking(code, patch){ const b=this.getBookings().map(x=>x.code===code?Object.assign({},x,patch):x); write(BOOK_KEY,b); return b; },
     getBooking(code){ return this.getBookings().find(x=>x.code===code); },
-    resetAll(){ localStorage.removeItem(BOATS_KEY); localStorage.removeItem(BOOK_KEY); },
+    resetAll(){ localStorage.removeItem(BOATS_KEY); localStorage.removeItem(BOOK_KEY); localStorage.removeItem(ADDONS_KEY); },
 
-    /* ---- add-ons / extras (shared) ---- */
-    ADDONS: ADDONS,
-    addon(id){ return ADDONS.find(a=>a.id===id); },
+    /* ---- add-ons / extras: editable catalog, chosen per boat ---- */
+    getAddons(){ let a=read(ADDONS_KEY,null); if(!a){ a=DEFAULT_ADDONS.slice(); write(ADDONS_KEY,a); } return a; },
+    saveAddons(arr){ write(ADDONS_KEY, arr); },
+    addon(id){ return this.getAddons().find(a=>a.id===id); },
     addonList(ids){ return (ids||[]).map(id=>this.addon(id)).filter(Boolean); },
-    addonsSum(ids){ return this.addonList(ids).reduce((s,a)=>s+a.price,0); },
+    addonsSum(ids){ return this.addonList(ids).reduce((s,a)=>s+(a.price||0),0); },
+    // extras a specific boat offers (falls back to the whole catalog for older boats with no list)
+    boatExtras(boatId){
+      const b=this.getBoats().find(x=>x.id===boatId), cat=this.getAddons();
+      const ids=(b && Array.isArray(b.extras)) ? b.extras : cat.map(a=>a.id);
+      return ids.map(id=>cat.find(a=>a.id===id)).filter(Boolean);
+    },
     bookingBase(b){ return (b.base!=null) ? b.base : ((b.subtotal||0) - this.addonsSum(b.addons)); },
     // recompute subtotal (base + selected extras) and persist a booking's extras
     setBookingAddons(code, ids){

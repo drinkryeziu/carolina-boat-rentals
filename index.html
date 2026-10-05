@@ -759,7 +759,7 @@ function renderHeroSelect(){
   sel.innerHTML = FLEET.filter(b=>b.status!=="soldout")
     .map(b=>`<option value="${b.id}">${b.name} — from ${CBR.money(b.half)}</option>`).join("");
 }
-const ADDONS = CBR.ADDONS;   // shared add-ons list (store.js)
+function currentExtras(){ return CBR.boatExtras(state.boat); }   // extras the chosen boat offers
 const TIME_SLOTS = [
   {id:"am",  label:"Morning · 9:00–1:00",  sub:"Half day",  mult:1,    left:3},
   {id:"pm",  label:"Afternoon · 2:00–6:00",sub:"Half day",  mult:1,    left:1},
@@ -804,6 +804,10 @@ function renderBoats(){
 }
 function pickBoat(k){
   state.boat=k; renderBoats();
+  // extras are per-boat: drop any selected extra the new boat doesn't offer
+  const offered=currentExtras().map(a=>a.id);
+  Object.keys(state.addons).forEach(id=>{ if(state.addons[id] && offered.indexOf(id)<0) delete state.addons[id]; });
+  if(document.querySelector('.step-pane[data-pane="3"].active')) renderAddons();
   // availability is per-boat: clear the date(s) if now unavailable for this boat
   if(state.date){
     const s=state.date;
@@ -900,12 +904,13 @@ function pickSlot(id){state.slot=id;renderSlots();updateTotal();}
 
 /* ---------------- STEP 3: ADD-ONS ---------------- */
 function renderAddons(){
-  $("#addonList").innerHTML = ADDONS.map(a=>`
+  const ex=currentExtras();
+  $("#addonList").innerHTML = ex.length ? ex.map(a=>`
     <div class="addon ${a.rec?'insure-highlight':''}">
-      <div class="ic" style="font-size:20px">${a.icon}</div>
-      <div class="info"><b>${a.name}${a.rec?'<span class="rec-badge">Recommended</span>':''}</b><span>${a.sub}</span><div class="price">+ ${money(a.price)}</div></div>
+      <div class="ic" style="font-size:20px">${a.icon||'🎁'}</div>
+      <div class="info"><b>${a.name}${a.rec?'<span class="rec-badge">Recommended</span>':''}</b><span>${a.sub||''}</span><div class="price">+ ${money(a.price)}</div></div>
       <div class="switch ${state.addons[a.id]?'on':''}" onclick="toggleAddon('${a.id}')"></div>
-    </div>`).join("");
+    </div>`).join("") : `<div style="color:var(--muted);font-size:14px;padding:10px 2px">No extras available for this boat.</div>`;
 }
 function toggleAddon(id){state.addons[id]=!state.addons[id];renderAddons();updateTotal();}
 
@@ -925,7 +930,7 @@ function calcTotal(){
   let base = b.half;
   if(days>1){ base = b.full*days; }                                        // multi-day = full-day rate per day
   else if(state.slot){ const s=TIME_SLOTS.find(x=>x.id===state.slot); base=Math.round(b.half*s.mult); }
-  let addons=0; ADDONS.forEach(a=>{if(state.addons[a.id])addons+=a.price;});
+  let addons=0; currentExtras().forEach(a=>{if(state.addons[a.id])addons+=a.price;});
   const subtotal=base+addons;
   const deposit=Math.round(subtotal*0.3);
   return {base,addons,subtotal,deposit,b};
@@ -942,7 +947,7 @@ function renderSummary(){
   let rows=`
     <div class="sum-line"><span>${boatLine}</span><b>${money(t.base)}</b></div>
     <div class="sum-line"><span class="muted">${when}</span><span></span></div>`;
-  ADDONS.forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
+  currentExtras().forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
   rows+=`
     <div class="sum-line tot"><span>Trip total</span><span>${money(t.subtotal)}</span></div>
     <div class="sum-line"><span class="muted">Deposit due now (30%, refundable)</span><span class="muted">${money(t.deposit)}</span></div>
@@ -965,7 +970,7 @@ function confirmBooking(){
     date: state.date?state.date.toISOString().slice(0,10):"",
     endDate: state.endDate?state.endDate.toISOString().slice(0,10):null, days,
     dateLabel: state.dateLabel||"",
-    slot, base:t.base, addons:ADDONS.filter(a=>state.addons[a.id]).map(a=>a.id),
+    slot, base:t.base, addons:currentExtras().filter(a=>state.addons[a.id]).map(a=>a.id),
     subtotal:t.subtotal, deposit:t.deposit,
     status:"confirmed", createdAt:new Date().toISOString().slice(0,10),
     balancePaid:false, payMethod:null, cashOnly:false, insurance:!!state.addons.insurance
@@ -1112,7 +1117,7 @@ function showCancelDone(b, refund, already){
 
 // Load fleet from the owner dashboard store, and refresh if the owner edits it in another tab.
 loadFleet();
-window.addEventListener("storage", e=>{ if(e.key==="cbr_boats_v3") loadFleet(); });
+window.addEventListener("storage", e=>{ if(e.key==="cbr_boats_v4"||e.key==="cbr_addons_v1") loadFleet(); });
 </script>
 </body>
 </html>

@@ -199,6 +199,17 @@ tbody tr:hover{background:#fafcfe}
 .ex-tot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;font-weight:700;color:var(--navy)}
 .ex-note{font-size:11.5px;color:var(--muted);margin-top:6px}
 
+/* ---------- BOAT EDITOR: EXTRAS ---------- */
+.be-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.be-row{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.be-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--ok);cursor:pointer;flex:0 0 auto}
+.be-row .be-name{flex:1;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13.5px;background:#fbfcfe;min-width:0}
+.be-row .be-price{display:flex;align-items:center;gap:3px;font-size:13.5px;color:var(--muted);flex:0 0 auto}
+.be-row .be-price input{width:70px;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:13.5px;background:#fbfcfe}
+.be-row .be-name:focus,.be-row .be-price input:focus{outline:none;border-color:var(--blue)}
+.be-rm{flex:0 0 auto;width:28px;height:28px;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:var(--muted);font-size:17px;line-height:1;cursor:pointer}
+.be-rm:hover{border-color:#c0392b;color:#c0392b}
+
 /* ---------- WALK-UP BOOKING ---------- */
 .tb-btn.gold{background:linear-gradient(180deg,var(--sun),var(--sun-deep));color:#3a2500;border-color:transparent}
 .tb-btn.gold:hover{box-shadow:0 6px 16px rgba(245,147,0,.35);color:#3a2500}
@@ -408,6 +419,12 @@ tbody tr:hover{background:#fafcfe}
           </div>
           <input id="b-file" type="file" accept="image/*" class="hidden" onchange="pickImage(event)" />
         </div>
+        <div class="f full">
+          <label>Extras this boat offers</label>
+          <div class="hint">Check the ones available for this boat. Edit a name or price to change it everywhere; add a new one at the bottom.</div>
+          <div id="b-extras" class="be-list"></div>
+          <button type="button" class="mini" style="margin-top:10px" onclick="beAddExtra()">＋ Add a new extra</button>
+        </div>
       </div>
     </div>
     <div class="modal-foot">
@@ -473,6 +490,7 @@ const AUTH_KEY="cbr_auth";
 const CREDS={user:"owner",pass:"lakenorman"};
 const TODAY="2026-07-14";
 let editingImage=null, editingId=null;
+let beCatalog=[], beOffered=new Set();   // boat-editor working copy of the extras catalog + this boat's offered ids
 let rentalTab="all";
 let expanded=new Set();   // rental rows expanded to show extras
 
@@ -593,14 +611,17 @@ function renderRentals(){
 function extrasPanel(b){
   const base=CBR.bookingBase(b);
   const slot=(b.slot||"rental").split(" · ")[0];
-  const items=CBR.ADDONS.map(a=>{
+  const offered=CBR.boatExtras(b.boatId), offeredIds=offered.map(a=>a.id);
+  const alsoOrdered=(b.addons||[]).filter(id=>offeredIds.indexOf(id)<0).map(id=>CBR.addon(id)).filter(Boolean);
+  const list=offered.concat(alsoOrdered);
+  const items=list.length ? list.map(a=>{
     const on=(b.addons||[]).indexOf(a.id)>-1;
     return `<label class="ex-item ${on?'on':''}">
       <input type="checkbox" ${on?'checked':''} onchange="toggleExtra('${b.code}','${a.id}')">
-      <span class="ex-ic">${a.icon}</span>
+      <span class="ex-ic">${a.icon||'🎁'}</span>
       <span class="ex-nm">${a.name}<small>+ ${CBR.money(a.price)}</small></span>
     </label>`;
-  }).join("");
+  }).join("") : `<div style="color:var(--muted);font-size:13px;padding:6px 2px">This boat offers no extras. Add some in the boat editor.</div>`;
   return `<div class="extras">
     <div class="ex-head">What they ordered — extras</div>
     <div class="ex-base">${b.boatName} — ${slot} · rental <b>${CBR.money(base)}</b></div>
@@ -866,15 +887,19 @@ function wuTotal(){ return Math.max(0, parseInt($("#wu-total").value,10)||0); } 
 function wuExtrasSum(){ let s=0; wuAddons.forEach(id=>{ const a=CBR.addon(id); if(a) s+=a.price; }); return s; }
 function wuGrand(){ return wuTotal()+wuExtrasSum(); }                            // boat + extras
 function wuRenderExtras(){
-  $("#wu-extras").innerHTML=CBR.ADDONS.map(a=>{
+  const ex=CBR.boatExtras($("#wu-boat").value);
+  $("#wu-extras").innerHTML= ex.length ? ex.map(a=>{
     const on=wuAddons.has(a.id);
     return `<label class="ex-item ${on?'on':''}"><input type="checkbox" ${on?'checked':''} onchange="wuToggleExtra('${a.id}')">
-      <span class="ex-ic">${a.icon}</span><span class="ex-nm">${a.name}<small>+ ${CBR.money(a.price)}</small></span></label>`;
-  }).join("");
+      <span class="ex-ic">${a.icon||'🎁'}</span><span class="ex-nm">${a.name}<small>+ ${CBR.money(a.price)}</small></span></label>`;
+  }).join("") : `<div style="color:var(--muted);font-size:13px;padding:4px 2px">This boat has no extras.</div>`;
 }
 function wuToggleExtra(id){ wuAddons.has(id)?wuAddons.delete(id):wuAddons.add(id); wuRenderExtras(); wuTotalChanged(); }
-function wuPrice(){                    // recompute boat price from boat + duration
+function wuPrice(){                    // recompute boat price from boat + duration; refresh this boat's extras
   const b=CBR.getBoats().find(x=>x.id===$("#wu-boat").value);
+  const offered=CBR.boatExtras($("#wu-boat").value).map(a=>a.id);
+  [...wuAddons].forEach(id=>{ if(offered.indexOf(id)<0) wuAddons.delete(id); });   // drop extras not on this boat
+  wuRenderExtras();
   const calc=DURS[$("#wu-dur").value]||DURS.half;
   $("#wu-total").value = b?calc(b):0;
   wuTotalChanged();
@@ -1022,7 +1047,29 @@ function openBoat(id){
   $("#b-prev-t").textContent = b&&CBR.isImage(b.image)?"Photo set — click to change":"Upload a boat photo";
   editingImage = b?b.image:null;
   $("#b-file").value="";
+  // extras: working copy of the catalog + which ones this boat offers (new boat → all)
+  beCatalog = CBR.getAddons().map(a=>Object.assign({},a));
+  beOffered = new Set(b && Array.isArray(b.extras) ? b.extras : beCatalog.map(a=>a.id));
+  beRender();
   $("#boatOverlay").classList.add("open");
+}
+function beRender(){
+  $("#b-extras").innerHTML = beCatalog.map(a=>`
+    <div class="be-row">
+      <input type="checkbox" ${beOffered.has(a.id)?'checked':''} onchange="beToggle('${a.id}',this.checked)" title="Offered on this boat">
+      <input class="be-name" value="${(a.name||'').replace(/"/g,'&quot;')}" oninput="beName('${a.id}',this.value)" placeholder="Extra name" />
+      <span class="be-price">$<input type="number" min="0" value="${a.price||0}" oninput="bePrice('${a.id}',this.value)" /></span>
+      <button type="button" class="be-rm" onclick="beRemove('${a.id}')" title="Delete this extra">×</button>
+    </div>`).join("") || `<div style="color:var(--muted);font-size:13px;padding:4px 2px">No extras yet — add one below.</div>`;
+}
+function beToggle(id, on){ on?beOffered.add(id):beOffered.delete(id); }
+function beName(id, v){ const a=beCatalog.find(x=>x.id===id); if(a) a.name=v; }
+function bePrice(id, v){ const a=beCatalog.find(x=>x.id===id); if(a) a.price=Math.max(0,parseInt(v,10)||0); }
+function beRemove(id){ beCatalog=beCatalog.filter(a=>a.id!==id); beOffered.delete(id); beRender(); }
+function beAddExtra(){
+  const id="x-"+Math.random().toString(36).slice(2,7);
+  beCatalog.push({id, name:"", price:0, icon:"🎁"}); beOffered.add(id); beRender();
+  const inputs=$("#b-extras").querySelectorAll(".be-name"); if(inputs.length) inputs[inputs.length-1].focus();
 }
 function closeBoat(){ $("#boatOverlay").classList.remove("open"); }
 $("#boatOverlay").addEventListener("click",e=>{if(e.target.id==="boatOverlay")closeBoat();});
@@ -1040,13 +1087,19 @@ function saveBoat(){
   const half=parseInt($("#b-half").value,10), full=parseInt($("#b-full").value,10);
   if(!name){ toast("Give the boat a name"); return; }
   if(!half||!full){ toast("Add half-day and full-day rates"); return; }
+  // commit the extras catalog (drop blank-named ones) and this boat's chosen extras
+  const cat=beCatalog.filter(a=>(a.name||"").trim());
+  cat.forEach(a=>{ a.name=a.name.trim(); a.price=Math.max(0,parseInt(a.price,10)||0); });
+  CBR.saveAddons(cat);
+  const catIds=cat.map(a=>a.id);
+  const extras=[...beOffered].filter(id=>catIds.indexOf(id)>-1);
   const palette=["linear-gradient(135deg,#2e9fe0,#0f3a5f)","linear-gradient(135deg,#38c1c9,#123a5c)","linear-gradient(135deg,#ffb020,#f59300)","linear-gradient(135deg,#8a63d2,#3b1e73)"];
   const tags=$("#b-tags").value.split(",").map(s=>s.trim()).filter(Boolean);
   const boat={
     id: editingId || CBR.slug(name),
     name, sub:$("#b-sub").value.trim(), desc:$("#b-desc").value.trim(),
     capacity: parseInt($("#b-cap").value,10)||null,
-    half, full, tags,
+    half, full, tags, extras,
     status:$("#b-status").value, statusText:$("#b-statusText").value.trim()|| (({available:"Available",limited:"Limited availability",soldout:"Fully booked"})[$("#b-status").value]),
     image: editingImage || palette[Math.floor(Math.random()*palette.length)]
   };
