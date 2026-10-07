@@ -415,8 +415,12 @@ footer a:hover{color:#fff}
           </select>
         </div>
         <div class="field">
-          <label>Date</label>
-          <input type="date" id="hb-date" />
+          <label>Dates <span style="text-transform:none;font-weight:600;color:var(--muted)">· one day or a range</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="date" id="hb-date" style="flex:1" />
+            <span style="color:var(--muted);font-weight:700">→</span>
+            <input type="date" id="hb-end" title="End date (optional, for multi-day)" style="flex:1" />
+          </div>
         </div>
         <div class="field">
           <label>Duration</label>
@@ -442,7 +446,7 @@ footer a:hover{color:#fff}
           </select>
         </div>
       </div>
-      <button class="btn btn-sun" onclick="openBooking(false)">Search available boats →</button>
+      <button class="btn btn-sun" onclick="heroSearch()">Search available boats →</button>
       <div class="booker-foot">🔒 No charge today — secure a spot with a refundable hold</div>
     </div>
   </div>
@@ -779,6 +783,23 @@ function toast(msg){const t=$("#toast");t.innerHTML="✓ "+msg;t.classList.add("
 function toggleMenu(){$("#mobileMenu").classList.toggle("open");}
 
 /* ---------------- OPEN / CLOSE ---------------- */
+// Hero "Search available boats": carry the chosen boat + date(s) into the booking flow, then open at Choose your boat.
+function heroSearch(){
+  const hb=$("#hb-boat"); if(hb) state.boat=hb.value;
+  const sd=$("#hb-date").value, ed=$("#hb-end").value;
+  state.date=null; state.endDate=null; state.slot=null;
+  if(sd){
+    state.date=new Date(sd+"T12:00:00");
+    if(ed && ed>sd){                                   // a multi-day range
+      const end=new Date(ed+"T12:00:00");
+      if(!rangeHasBlocked(state.date,end)){ state.endDate=end; state.slot="full"; }
+      else toast("That range includes an unavailable day — pick dates in the calendar");
+    }
+    if(state.date) calMonth=new Date(state.date.getFullYear(),state.date.getMonth(),1);
+    updateDateLabel();
+  }
+  openBooking(false);
+}
 function openBooking(skipToDate,boat){
   if(boat) state.boat=boat;
   else {const hb=$("#hb-boat"); if(hb) state.boat=hb.value;}
@@ -1036,7 +1057,9 @@ function prevStep(){if(step>1){step--;showStep();}}
 $("#hb-boat")&&$("#hb-boat").addEventListener("change",e=>state.boat=e.target.value);
 
 // init hero date default
-(function(){const d=$("#hb-date"); if(d){const t=new Date(2026,6,18);d.value=t.toISOString().slice(0,10);d.min="2026-07-14";}})();
+(function(){const d=$("#hb-date"),e=$("#hb-end"); if(d){const t=new Date(2026,6,18);d.value=t.toISOString().slice(0,10);d.min="2026-07-14";} if(e){e.min="2026-07-14";}
+  if(d&&e){ d.addEventListener("change",()=>{ e.min=d.value||"2026-07-14"; if(e.value&&e.value<d.value) e.value=""; }); }
+})();
 
 // demo card-input formatting (cosmetic only)
 document.addEventListener("input",e=>{
