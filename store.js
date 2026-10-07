@@ -6,7 +6,7 @@
    ============================================================ */
 (function(){
   const BOATS_KEY  = "cbr_boats_v4";
-  const BOOK_KEY   = "cbr_bookings_v5";
+  const BOOK_KEY   = "cbr_bookings_v6";
   const ADDONS_KEY = "cbr_addons_v1";
 
   // Editable extras catalog. Each boat picks which of these it offers (boat.extras = [ids]).
@@ -69,7 +69,8 @@
     {code:"CBR-3NR7X", name:"Nathan Cole",     phone:"(704) 555-0158", email:"ncole@email.com",     boatId:"waverunner",boatName:"Waverunners",       date:"2026-07-15", dateLabel:"Wed, Jul 15", slot:"Afternoon · 2:00–6:00",  base:289, addons:["tube"],            subtotal:338, deposit:101, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:false, insurance:false},
     {code:"CBR-6P3WD", name:"Carlos Mendez",   phone:"(704) 555-0190", email:"cmendez@email.com",   boatId:"waverunner",boatName:"Waverunners",       date:"2026-07-18", dateLabel:"Sat, Jul 18", slot:"Morning · 9:00–1:00",    base:338, addons:[],                  subtotal:338, deposit:101, status:"confirmed", createdAt:"2026-07-10", balancePaid:false, payMethod:null,   cashOnly:false, insurance:false},
     {code:"CBR-9T5HG", name:"Priya Nair",      phone:"(980) 555-0166", email:"priya.n@email.com",   boatId:"tritoon",   boatName:"Luxury Tritoon",    date:"2026-07-19", dateLabel:"Sun, Jul 19", slot:"Full day · 9:00–6:00",   base:798, addons:["insurance"],       subtotal:837, deposit:251, status:"confirmed", createdAt:"2026-07-11", balancePaid:false, payMethod:null,   cashOnly:false, insurance:true},
-    {code:"CBR-2B8KL", name:"Jordan Blake",    phone:"(704) 555-0123", email:"jblake@email.com",    boatId:"pontoon",   boatName:"Classic Pontoon",   date:"2026-07-25", dateLabel:"Sat, Jul 25", slot:"Full day · 9:00–6:00",   base:530, addons:["cooler","delivery"],subtotal:660, deposit:184, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:true,  insurance:false}
+    {code:"CBR-2B8KL", name:"Jordan Blake",    phone:"(704) 555-0123", email:"jblake@email.com",    boatId:"pontoon",   boatName:"Classic Pontoon",   date:"2026-07-25", dateLabel:"Sat, Jul 25", slot:"Full day · 9:00–6:00",   base:530, addons:["cooler","delivery"],subtotal:660, deposit:184, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null,   cashOnly:true,  insurance:false},
+    {code:"CBR-7E4VN", name:"Lakeside Youth Foundation", phone:"(704) 555-0211", email:"ops@lakesideyouth.org", boatId:"tritoon", boatName:"Luxury Tritoon", date:"2026-07-26", dateLabel:"Sun, Jul 26", slot:"Full day · 9:00–6:00", base:799, addons:["cooler"], subtotal:834, deposit:250, status:"confirmed", createdAt:"2026-07-13", balancePaid:false, payMethod:null, cashOnly:false, insurance:false, taxExempt:true, exemptDoc:"E-595E-Lakeside-Youth.pdf"}
   ];
 
   function read(key, fallback){
@@ -129,7 +130,9 @@
     TAX_CAP: 1500,                        // per-article cap from NCDOR
     TAX_LABEL: "NC boat tax (3%)",
     taxOn(amount){ return Math.min(Math.round((amount||0)*this.TAX_RATE), this.TAX_CAP); },
-    grandTotal(b){ return (b.subtotal||0) + this.taxOn(b.subtotal||0); },
+    // tax for a booking — zero when the booking is flagged tax-exempt (resale/non-profit cert on file)
+    taxFor(b){ return (b && b.taxExempt) ? 0 : this.taxOn((b&&b.subtotal)||0); },
+    grandTotal(b){ return ((b&&b.subtotal)||0) + this.taxFor(b); },
 
     /* ---- cancellation / refund policy (shared by dashboard + public site) ---- */
     NOW: "2026-07-14T10:00:00",           // fixed "now" for the demo

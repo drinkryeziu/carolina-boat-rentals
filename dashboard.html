@@ -197,6 +197,8 @@ tbody tr:hover{background:#fafcfe}
 .ex-item .ex-nm{color:var(--navy);font-weight:600;line-height:1.2}
 .ex-item .ex-nm small{display:block;font-weight:700;color:var(--muted);font-size:11px}
 .ex-tot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;font-weight:700;color:var(--navy)}
+.inv-exempt{background:#effbf2;border:1px solid #bfe6c9;color:#1f7a3d;border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:14px}
+.exempt-tag{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:800;letter-spacing:.03em;color:#1f7a3d;background:#effbf2;border:1px solid #bfe6c9;border-radius:999px;padding:1px 7px;vertical-align:middle}
 .ex-note{font-size:11.5px;color:var(--muted);margin-top:6px}
 
 /* ---------- BOAT EDITOR: EXTRAS ---------- */
@@ -591,7 +593,7 @@ function renderRentals(){
       </div></td>
       <td>${b.boatName}</td>
       <td>${b.dateLabel||b.date}<div style="font-size:12px;color:var(--muted)">${(b.slot||"").split(" · ")[0]}</div></td>
-      <td class="money">${CBR.money(CBR.grandTotal(b))}</td>
+      <td class="money">${CBR.money(CBR.grandTotal(b))}${b.taxExempt?'<span class="exempt-tag" title="Tax-exempt — certificate on file">TAX-EXEMPT</span>':''}</td>
       <td>${b.source==="walk-up"?'<span style="color:var(--muted)">—</span>':CBR.money(b.deposit||0)}</td>
       <td>${balanceCell(b)}</td>
       <td><span class="status ${b.status||'confirmed'}"><span class="d"></span>${(b.status||'confirmed').replace(/^\w/,c=>c.toUpperCase())}</span></td>
@@ -626,7 +628,7 @@ function extrasPanel(b){
     <div class="ex-head">What they ordered — extras</div>
     <div class="ex-base">${b.boatName} — ${slot} · rental <b>${CBR.money(base)}</b></div>
     <div class="ex-grid">${items}</div>
-    <div class="ex-tot"><span>Rental + extras ${CBR.money(b.subtotal||0)} + ${CBR.TAX_LABEL} ${CBR.money(CBR.taxOn(b.subtotal||0))}</span><b>${CBR.money(CBR.grandTotal(b))}</b></div>
+    <div class="ex-tot"><span>Rental + extras ${CBR.money(b.subtotal||0)} + ${CBR.TAX_LABEL} ${b.taxExempt?'<b style="color:var(--ok)">Exempt ✓</b>':CBR.money(CBR.taxFor(b))}</span><b>${CBR.money(CBR.grandTotal(b))}</b></div>
     <div class="ex-note">Tick an extra the guest adds — the total, balance due, and invoice update automatically.</div>
   </div>`;
 }
@@ -722,7 +724,7 @@ function showInvoice(code){
   const b=CBR.getBookings().find(x=>x.code===code); if(!b) return;
   const walkup=b.source==="walk-up";
   const deposit=walkup?0:(b.deposit||0);
-  const sub=b.subtotal||0, tax=CBR.taxOn(sub), grand=CBR.grandTotal(b);
+  const sub=b.subtotal||0, tax=CBR.taxFor(b), grand=CBR.grandTotal(b), exempt=!!b.taxExempt;
   const balance=b.balancePaid?0:balanceOf(b);
   const paid=grand-balance;
   let methodLabel;
@@ -743,6 +745,7 @@ function showInvoice(code){
           <div><h5>Billed to</h5><div><b>${b.name}</b><br>${b.phone||""}<br>${b.email||""}</div></div>
           <div style="text-align:right"><h5>Trip</h5><div>${b.boatName}<br>${b.slot||""}<br>${b.dateLabel||b.date}${walkup?'<br><b>Walk-up booking</b>':''}</div></div>
         </div>
+        ${exempt?`<div class="inv-exempt">🧾 <b>Tax-exempt</b> — no sales tax charged.${b.exemptDoc?` Certificate on file: <b>${b.exemptDoc}</b>`:" Certificate pending."}</div>`:""}
         <table class="inv-table">
           <thead><tr><th>Description</th><th class="r">Amount</th></tr></thead>
           <tbody>
@@ -752,7 +755,7 @@ function showInvoice(code){
         </table>
         <div class="inv-tot">
           <div class="l"><span>Subtotal</span><span>${CBR.money(sub)}</span></div>
-          <div class="l"><span>${CBR.TAX_LABEL}</span><span>${CBR.money(tax)}</span></div>
+          <div class="l"><span>${CBR.TAX_LABEL}</span><span>${exempt?'<b style="color:var(--ok)">Exempt ✓</b>':CBR.money(tax)}</span></div>
           <div class="l" style="font-weight:700;color:var(--navy)"><span>Trip total</span><span>${CBR.money(grand)}</span></div>
           ${walkup?"":`<div class="l"><span>Deposit paid (30%)</span><span>− ${CBR.money(deposit)}</span></div>`}
           <div class="l paid"><span>Paid to date</span><span>${CBR.money(paid)}</span></div>
@@ -783,7 +786,7 @@ function emailInvoice(b, balance, methodLabel){
     `Boat: ${b.boatName} (${b.slot||"rental"})`,
     `Trip date: ${b.dateLabel||b.date}`,
     `Subtotal: ${CBR.money(b.subtotal||0)}`,
-    `${CBR.TAX_LABEL}: ${CBR.money(CBR.taxOn(b.subtotal||0))}`,
+    `${CBR.TAX_LABEL}: ${b.taxExempt?"Exempt (certificate on file)":CBR.money(CBR.taxFor(b))}`,
     `Trip total: ${CBR.money(CBR.grandTotal(b))}`,
     (b.source==="walk-up"?"":`Deposit paid: ${CBR.money(b.deposit||0)}`),
     `Balance ${balance>0?"due at dock":"paid"}: ${CBR.money(balance)}`,

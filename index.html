@@ -277,6 +277,14 @@ footer a:hover{color:#fff}
 .waiver-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;max-height:110px;overflow-y:auto;font-size:12.5px;color:var(--muted);margin-top:6px}
 .check-row{display:flex;gap:11px;align-items:flex-start;margin-top:14px;font-size:13.5px;color:var(--ink)}
 .check-row input{margin-top:3px;width:18px;height:18px;accent-color:var(--blue)}
+/* tax exemption */
+.exempt-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:14px}
+.exempt-box .check-row{margin-top:0}
+.exempt-upload{margin-top:12px}
+.exempt-drop{display:flex;align-items:center;gap:13px;border:1.6px dashed #b9cfe0;border-radius:12px;padding:14px 16px;cursor:pointer;background:#f7fbfe;transition:.15s}
+.exempt-drop:hover{border-color:var(--blue);background:#eef6fd}
+.exempt-drop.done{border-style:solid;border-color:var(--ok);background:#effbf2}
+.exempt-ic{font-size:26px;flex:0 0 auto}
 
 /* summary */
 .sum-line{display:flex;justify-content:space-between;font-size:14.5px;padding:8px 0;color:#334b62}
@@ -685,6 +693,18 @@ footer a:hover{color:#fff}
           <div class="pane-sub">Pay 30% now to lock your boat — the balance is due at the dock.</div>
           <div class="confirm-card" id="summary"></div>
 
+          <div class="exempt-box">
+            <label class="check-row"><input type="checkbox" id="taxExempt" onchange="toggleExempt()" /> <span>Tax-exempt order (resale, non-profit, or government). I hold a valid NC exemption certificate.</span></label>
+            <div id="exemptUpload" class="exempt-upload" style="display:none">
+              <label class="exempt-drop" for="exemptFile">
+                <input type="file" id="exemptFile" accept=".pdf,.jpg,.jpeg,.png,image/*,application/pdf" onchange="exemptPicked()" hidden />
+                <span class="exempt-ic">📄</span>
+                <span id="exemptLabel"><b>Upload your exemption certificate</b><br><span class="muted" style="font-size:12.5px">Form E-595E or equivalent · PDF or image</span></span>
+              </label>
+              <div class="pay-note" style="margin-top:8px">No sales tax is charged on this order. The certificate is kept on file for your records — our team verifies it before the trip.</div>
+            </div>
+          </div>
+
           <div class="pay-box">
             <div class="pay-head">
               <span class="pay-due">Due now (30% deposit)<b id="payDue">$0</b></span>
@@ -774,7 +794,7 @@ const TIME_SLOTS = [
 /* ---------------- STATE ---------------- */
 let step = 1;
 let calMonth = new Date(2026,6,1); // July 2026
-const state = {boat:"tritoon", date:null, endDate:null, dateLabel:"", slot:null, addons:{insurance:true}, uploaded:false};
+const state = {boat:"tritoon", date:null, endDate:null, dateLabel:"", slot:null, addons:{insurance:true}, uploaded:false, taxExempt:false, exemptDoc:null};
 
 /* ---------------- HELPERS ---------------- */
 const $ = s=>document.querySelector(s);
@@ -953,12 +973,34 @@ function calcTotal(){
   else if(state.slot){ const s=TIME_SLOTS.find(x=>x.id===state.slot); base=Math.round(b.half*s.mult); }
   let addons=0; currentExtras().forEach(a=>{if(state.addons[a.id])addons+=a.price;});
   const subtotal=base+addons;
-  const tax=CBR.taxOn(subtotal);
+  const tax=state.taxExempt ? 0 : CBR.taxOn(subtotal);
   const total=subtotal+tax;
   const deposit=Math.round(total*0.3);
   return {base,addons,subtotal,tax,total,deposit,b};
 }
 function updateTotal(){$("#footTotal").textContent=money(calcTotal().total);}
+
+/* ---- tax exemption ---- */
+function toggleExempt(){
+  state.taxExempt = !!$("#taxExempt").checked;
+  const up=$("#exemptUpload"); if(up) up.style.display = state.taxExempt ? "block" : "none";
+  if(!state.taxExempt){ state.exemptDoc=null; const f=$("#exemptFile"); if(f) f.value=""; resetExemptDrop(); }
+  renderSummary(); updateTotal();
+  const nb=$("#nextBtn"); if(nb && step===5) nb.textContent=`Pay ${money(calcTotal().deposit)} deposit 🔒`;
+}
+function exemptPicked(){
+  const f=$("#exemptFile"), file=f&&f.files&&f.files[0];
+  if(!file){ state.exemptDoc=null; resetExemptDrop(); return; }
+  state.exemptDoc={name:file.name, size:file.size};
+  const drop=$(".exempt-drop"), lab=$("#exemptLabel");
+  if(drop) drop.classList.add("done");
+  if(lab) lab.innerHTML=`<b>✓ ${file.name}</b><br><span class="muted" style="font-size:12.5px">${(file.size/1024).toFixed(0)} KB · attached — click to replace</span>`;
+}
+function resetExemptDrop(){
+  const drop=$(".exempt-drop"), lab=$("#exemptLabel");
+  if(drop) drop.classList.remove("done");
+  if(lab) lab.innerHTML=`<b>Upload your exemption certificate</b><br><span class="muted" style="font-size:12.5px">Form E-595E or equivalent · PDF or image</span>`;
+}
 
 /* ---------------- STEP 5: SUMMARY ---------------- */
 function renderSummary(){
@@ -973,7 +1015,7 @@ function renderSummary(){
   currentExtras().forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
   rows+=`
     <div class="sum-line"><span class="muted">Subtotal</span><span class="muted">${money(t.subtotal)}</span></div>
-    <div class="sum-line"><span class="muted">${CBR.TAX_LABEL}</span><span class="muted">${money(t.tax)}</span></div>
+    <div class="sum-line"><span class="muted">${CBR.TAX_LABEL}</span><span class="muted">${state.taxExempt?'<b style="color:var(--ok)">Exempt ✓</b>':money(t.tax)}</span></div>
     <div class="sum-line tot"><span>Trip total</span><span>${money(t.total)}</span></div>
     <div class="sum-line"><span class="muted">Deposit due now (30%, refundable)</span><span class="muted">${money(t.deposit)}</span></div>
     <div class="sum-line"><span class="muted">Balance due at dock</span><span class="muted">${money(t.total-t.deposit)}</span></div>`;
@@ -997,6 +1039,7 @@ function confirmBooking(){
     dateLabel: state.dateLabel||"",
     slot, base:t.base, addons:currentExtras().filter(a=>state.addons[a.id]).map(a=>a.id),
     subtotal:t.subtotal, deposit:t.deposit,
+    taxExempt:!!state.taxExempt, exemptDoc: state.taxExempt&&state.exemptDoc?state.exemptDoc.name:null,
     status:"confirmed", createdAt:new Date().toISOString().slice(0,10),
     balancePaid:false, payMethod:null, cashOnly:false, insurance:!!state.addons.insurance
   });
@@ -1011,7 +1054,7 @@ function confirmBooking(){
       <div class="confirm-card">
         <div class="sum-line"><span>${t.b.name}</span><b>${money(t.subtotal)}</b></div>
         <div class="sum-line"><span class="muted">${state.dateLabel} · ${slot}</span></div>
-        <div class="sum-line"><span class="muted">${CBR.TAX_LABEL}</span><span class="muted">${money(t.tax)}</span></div>
+        <div class="sum-line"><span class="muted">${CBR.TAX_LABEL}</span><span class="muted">${state.taxExempt?'<b style="color:var(--ok)">Exempt ✓</b>':money(t.tax)}</span></div>
         <div class="sum-line tot"><span>Trip total</span><span>${money(t.total)}</span></div>
         <div class="sum-line"><span style="color:var(--ok)">Deposit paid (30%) ✓</span><span style="color:var(--ok)">${money(t.deposit)}</span></div>
         <div class="sum-line"><span class="muted">Balance at dock</span><span class="muted">${money(t.total-t.deposit)}</span></div>
@@ -1045,6 +1088,7 @@ function nextStep(){
     if(!state.uploaded){toast("Upload your boater card to continue");return;}
   }
   if(step===5){
+    if(state.taxExempt && !state.exemptDoc){toast("Upload your tax-exemption certificate, or uncheck tax-exempt");return;}
     const digits=($("#cc-num").value||"").replace(/\D/g,"");
     if(digits.length<15 || !$("#cc-exp").value || !$("#cc-cvc").value){toast("Enter test card details to pay the deposit");return;}
     const btn=$("#nextBtn"); btn.textContent="Processing…"; btn.disabled=true;
