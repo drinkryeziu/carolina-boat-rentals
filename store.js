@@ -122,6 +122,15 @@
       return this.updateBooking(code, { base, addons:ids.slice(), subtotal, insurance: ids.indexOf("insurance")>-1 });
     },
 
+    /* ---- NC sales/use tax ---- */
+    // Per NCDOR, boats are taxed at the 3% state rate only (exempt from local & transit tax), $1,500 cap.
+    // Rental treatment isn't spelled out on NCDOR's boat page — confirm with your accountant / NCDOR; change the rate here if needed.
+    TAX_RATE: 0.03,
+    TAX_CAP: 1500,                        // per-article cap from NCDOR
+    TAX_LABEL: "NC boat tax (3%)",
+    taxOn(amount){ return Math.min(Math.round((amount||0)*this.TAX_RATE), this.TAX_CAP); },
+    grandTotal(b){ return (b.subtotal||0) + this.taxOn(b.subtotal||0); },
+
     /* ---- cancellation / refund policy (shared by dashboard + public site) ---- */
     NOW: "2026-07-14T10:00:00",           // fixed "now" for the demo
     tripStartMs(b){

@@ -932,10 +932,12 @@ function calcTotal(){
   else if(state.slot){ const s=TIME_SLOTS.find(x=>x.id===state.slot); base=Math.round(b.half*s.mult); }
   let addons=0; currentExtras().forEach(a=>{if(state.addons[a.id])addons+=a.price;});
   const subtotal=base+addons;
-  const deposit=Math.round(subtotal*0.3);
-  return {base,addons,subtotal,deposit,b};
+  const tax=CBR.taxOn(subtotal);
+  const total=subtotal+tax;
+  const deposit=Math.round(total*0.3);
+  return {base,addons,subtotal,tax,total,deposit,b};
 }
-function updateTotal(){$("#footTotal").textContent=money(calcTotal().subtotal);}
+function updateTotal(){$("#footTotal").textContent=money(calcTotal().total);}
 
 /* ---------------- STEP 5: SUMMARY ---------------- */
 function renderSummary(){
@@ -949,9 +951,11 @@ function renderSummary(){
     <div class="sum-line"><span class="muted">${when}</span><span></span></div>`;
   currentExtras().forEach(a=>{if(state.addons[a.id])rows+=`<div class="sum-line"><span>${a.name}</span><b>${money(a.price)}</b></div>`;});
   rows+=`
-    <div class="sum-line tot"><span>Trip total</span><span>${money(t.subtotal)}</span></div>
+    <div class="sum-line"><span class="muted">Subtotal</span><span class="muted">${money(t.subtotal)}</span></div>
+    <div class="sum-line"><span class="muted">${CBR.TAX_LABEL}</span><span class="muted">${money(t.tax)}</span></div>
+    <div class="sum-line tot"><span>Trip total</span><span>${money(t.total)}</span></div>
     <div class="sum-line"><span class="muted">Deposit due now (30%, refundable)</span><span class="muted">${money(t.deposit)}</span></div>
-    <div class="sum-line"><span class="muted">Balance due at dock</span><span class="muted">${money(t.subtotal-t.deposit)}</span></div>`;
+    <div class="sum-line"><span class="muted">Balance due at dock</span><span class="muted">${money(t.total-t.deposit)}</span></div>`;
   $("#summary").innerHTML=rows;
   const pd=$("#payDue"); if(pd) pd.textContent=money(t.deposit);
 }
@@ -986,9 +990,10 @@ function confirmBooking(){
       <div class="confirm-card">
         <div class="sum-line"><span>${t.b.name}</span><b>${money(t.subtotal)}</b></div>
         <div class="sum-line"><span class="muted">${state.dateLabel} · ${slot}</span></div>
-        <div class="sum-line"><span class="muted">Launch: Blythe Landing, Huntersville</span></div>
-        <div class="sum-line tot"><span>Deposit paid (30%)</span><span style="color:var(--ok)">${money(t.deposit)} ✓</span></div>
-        <div class="sum-line"><span class="muted">Balance at dock</span><span class="muted">${money(t.subtotal-t.deposit)}</span></div>
+        <div class="sum-line"><span class="muted">${CBR.TAX_LABEL}</span><span class="muted">${money(t.tax)}</span></div>
+        <div class="sum-line tot"><span>Trip total</span><span>${money(t.total)}</span></div>
+        <div class="sum-line"><span style="color:var(--ok)">Deposit paid (30%) ✓</span><span style="color:var(--ok)">${money(t.deposit)}</span></div>
+        <div class="sum-line"><span class="muted">Balance at dock</span><span class="muted">${money(t.total-t.deposit)}</span></div>
       </div>
       <p style="font-size:12.5px;color:var(--muted);margin-top:14px">Plans change? <a href="#" onclick="manageBooking('${code}');return false;" style="color:var(--blue);font-weight:700">Cancel this booking</a> — free up to 48 hours before. Or call 704-614-2118.</p>
     </div>`;

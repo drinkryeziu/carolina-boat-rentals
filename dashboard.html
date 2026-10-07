@@ -546,7 +546,7 @@ function renderTiles(){
     </div>`).join("");
 }
 
-function balanceOf(b){ return (b.subtotal||0)-(b.deposit||0); }
+function balanceOf(b){ return CBR.grandTotal(b)-(b.deposit||0); }   // balance owed includes tax
 
 function balanceCell(b){
   const bal=balanceOf(b);
@@ -591,7 +591,7 @@ function renderRentals(){
       </div></td>
       <td>${b.boatName}</td>
       <td>${b.dateLabel||b.date}<div style="font-size:12px;color:var(--muted)">${(b.slot||"").split(" · ")[0]}</div></td>
-      <td class="money">${CBR.money(b.subtotal||0)}</td>
+      <td class="money">${CBR.money(CBR.grandTotal(b))}</td>
       <td>${b.source==="walk-up"?'<span style="color:var(--muted)">—</span>':CBR.money(b.deposit||0)}</td>
       <td>${balanceCell(b)}</td>
       <td><span class="status ${b.status||'confirmed'}"><span class="d"></span>${(b.status||'confirmed').replace(/^\w/,c=>c.toUpperCase())}</span></td>
@@ -626,7 +626,7 @@ function extrasPanel(b){
     <div class="ex-head">What they ordered — extras</div>
     <div class="ex-base">${b.boatName} — ${slot} · rental <b>${CBR.money(base)}</b></div>
     <div class="ex-grid">${items}</div>
-    <div class="ex-tot"><span>Trip total (rental + extras)</span><b>${CBR.money(b.subtotal||0)}</b></div>
+    <div class="ex-tot"><span>Rental + extras ${CBR.money(b.subtotal||0)} + ${CBR.TAX_LABEL} ${CBR.money(CBR.taxOn(b.subtotal||0))}</span><b>${CBR.money(CBR.grandTotal(b))}</b></div>
     <div class="ex-note">Tick an extra the guest adds — the total, balance due, and invoice update automatically.</div>
   </div>`;
 }
@@ -722,8 +722,9 @@ function showInvoice(code){
   const b=CBR.getBookings().find(x=>x.code===code); if(!b) return;
   const walkup=b.source==="walk-up";
   const deposit=walkup?0:(b.deposit||0);
+  const sub=b.subtotal||0, tax=CBR.taxOn(sub), grand=CBR.grandTotal(b);
   const balance=b.balancePaid?0:balanceOf(b);
-  const paid=(b.subtotal||0)-balance;
+  const paid=grand-balance;
   let methodLabel;
   if(b.payMethod==="split") methodLabel=`Split — ${CBR.money(b.cardAmount||0)} card + ${CBR.money(b.cashAmount||0)} cash`;
   else if(b.payMethod) methodLabel=b.payMethod.charAt(0).toUpperCase()+b.payMethod.slice(1);
@@ -750,7 +751,9 @@ function showInvoice(code){
           </tbody>
         </table>
         <div class="inv-tot">
-          <div class="l"><span>Trip total</span><span>${CBR.money(b.subtotal||0)}</span></div>
+          <div class="l"><span>Subtotal</span><span>${CBR.money(sub)}</span></div>
+          <div class="l"><span>${CBR.TAX_LABEL}</span><span>${CBR.money(tax)}</span></div>
+          <div class="l" style="font-weight:700;color:var(--navy)"><span>Trip total</span><span>${CBR.money(grand)}</span></div>
           ${walkup?"":`<div class="l"><span>Deposit paid (30%)</span><span>− ${CBR.money(deposit)}</span></div>`}
           <div class="l paid"><span>Paid to date</span><span>${CBR.money(paid)}</span></div>
           <div class="l grand"><span>${balance>0?"Balance due":"Balance"}</span><span>${CBR.money(balance)}</span></div>
@@ -779,7 +782,9 @@ function emailInvoice(b, balance, methodLabel){
     `Invoice: ${b.code}`,
     `Boat: ${b.boatName} (${b.slot||"rental"})`,
     `Trip date: ${b.dateLabel||b.date}`,
-    `Trip total: ${CBR.money(b.subtotal||0)}`,
+    `Subtotal: ${CBR.money(b.subtotal||0)}`,
+    `${CBR.TAX_LABEL}: ${CBR.money(CBR.taxOn(b.subtotal||0))}`,
+    `Trip total: ${CBR.money(CBR.grandTotal(b))}`,
     (b.source==="walk-up"?"":`Deposit paid: ${CBR.money(b.deposit||0)}`),
     `Balance ${balance>0?"due at dock":"paid"}: ${CBR.money(balance)}`,
     `Payment method: ${methodLabel}`,"",
@@ -885,7 +890,9 @@ $("#wuOverlay").addEventListener("click",e=>{ if(e.target.id==="wuOverlay") clos
 
 function wuTotal(){ return Math.max(0, parseInt($("#wu-total").value,10)||0); }   // boat price
 function wuExtrasSum(){ let s=0; wuAddons.forEach(id=>{ const a=CBR.addon(id); if(a) s+=a.price; }); return s; }
-function wuGrand(){ return wuTotal()+wuExtrasSum(); }                            // boat + extras
+function wuSub(){ return wuTotal()+wuExtrasSum(); }                              // boat + extras (pre-tax)
+function wuTax(){ return CBR.taxOn(wuSub()); }
+function wuGrand(){ return wuSub()+wuTax(); }                                    // collect-now total incl. NC tax
 function wuRenderExtras(){
   const ex=CBR.boatExtras($("#wu-boat").value);
   $("#wu-extras").innerHTML= ex.length ? ex.map(a=>{
@@ -918,8 +925,7 @@ function wuSplitEven(){ const t=wuGrand(); const c=Math.round(t/2); $("#wu-card"
 function wuStatus(){
   const t=wuGrand(), card=parseInt($("#wu-card").value,10)||0, cash=parseInt($("#wu-cash").value,10)||0;
   const rem=t-card-cash, el=$("#wu-psstatus");
-  const ex=wuExtrasSum();
-  $("#wu-totlabel").textContent = ex ? `${CBR.money(t)} (${CBR.money(wuTotal())} + ${CBR.money(ex)} extras)` : CBR.money(t);
+  $("#wu-totlabel").textContent = t>0 ? `${CBR.money(t)}  (${CBR.money(wuSub())} + ${CBR.money(wuTax())} ${CBR.TAX_LABEL})` : CBR.money(t);
   if(t<=0){ el.className="ps-status warn"; el.textContent="Enter a boat price to collect."; $("#wu-save").disabled=true; return; }
   if(rem!==0){ el.className="ps-status warn"; el.textContent=rem>0?`Allocate ${CBR.money(rem)} more`:`Over by ${CBR.money(-rem)}`; $("#wu-save").disabled=true; return; }
   el.className="ps-status ok";
@@ -943,7 +949,7 @@ function saveWalkup(){
     boatId:boat?boat.id:"", boatName:boat?boat.name:"Boat",
     date:dv, dateLabel:d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}),
     slot:DUR_LABEL[$("#wu-dur").value], base:wuTotal(), addons, insurance:addons.indexOf("insurance")>-1,
-    subtotal:t, deposit:0,
+    subtotal:wuSub(), deposit:0,
     status: dv<TODAY?"completed":"confirmed",
     createdAt:TODAY, balancePaid:true, payMethod:method, cardAmount:card, cashAmount:cash, source:"walk-up"
   });
